@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#3146AE</color>
+    <color name="darkBlue">#182981</color>
+    <color name="yellow">#AEA235</color>
+    <color name="lightBlue">#2B9DD1</color>
+    <color name="pink">#F368FD</color>
+    <color name="orange">#FD5C12</color>
+    <color name="levelOne">#9300ff</color>
+    <color name="levelTwo">#235A14</color>
+    <color name="levelThree">#C13434</color>
+    <color name="levelFour">#F2F834</color>
+    <color name="levelFive">#16FBBB</color>
+    <color name="levelSix">#FB3C00</color>
+    <color name="levelSeven">#000000</color>
+    <color name="levelEight">#2C005E</color>
+    <color name="levelNine">#192EA1</color>
+</resources>
