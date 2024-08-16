@@ -1,5 +1,6 @@
-package com.myapps.pacman
+package com.myapps.pacman.game
 
+import com.myapps.pacman.R
 import com.myapps.pacman.flowData.BoardData
 import com.myapps.pacman.ghost.Blinky
 import com.myapps.pacman.ghost.Clyde
@@ -26,7 +27,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class Game(private var gameData: List<LevelStartData>) {
+class Game(private var gameData: List<LevelStartData>){
 
     //game coroutines
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -57,18 +58,19 @@ class Game(private var gameData: List<LevelStartData>) {
     private var dots = gameData[currentLevel].amountOfFood
     private var isBellAppear = false
 
-    //game Timers
+
+
+    //game Timers (control game events)
     private var ghostTimer = Timer()
     private var energizerTimer = Timer()
     private var bellTimer = Timer()
 
     // game map
-    private var gameMap: Matrix<Char> =
-        transformIntoCharMatrix(gameData[0].mapCharData, gameData[0].height, gameData[0].width)
+    private var gameMap: Matrix<Char> = transformIntoCharMatrix(gameData[0].mapCharData, gameData[0].height, gameData[0].width)
 
     //game Actors
-    private val pacman =
-        Pacman(currentPosition = gameData[0].pacmanDefaultPosition, movementsDelay = 200L)
+    private val pacman = Pacman(currentPosition = gameData[0].pacmanDefaultPosition, movementsDelay = 200L)
+
     private val blinky = Blinky(
         currentPosition = gameData[0].blinkyDefaultPosition,
         target = Position(0, 0),
@@ -119,7 +121,7 @@ class Game(private var gameData: List<LevelStartData>) {
     )
 
 
-    // flows to be attached
+    // flows to be collected
     val mapFlow = flow {
         emit(
             BoardData(
@@ -186,6 +188,7 @@ class Game(private var gameData: List<LevelStartData>) {
     }.flowOn(Dispatchers.Default)
 
 
+    // call this method to start the game
     fun initGame(movements: MutableList<Direction>) {
         gameJob = CoroutineScope(Dispatchers.Default).launch {
             TimeFlow.init()
@@ -198,14 +201,15 @@ class Game(private var gameData: List<LevelStartData>) {
             startActorsMovements(movements)
             while (isActive && !isGameLose && !isGameWin) {
                 clockManagement()
-                checkPacmanDeath(movements)
                 checkBellAppear()
+                checkPacmanDeath(movements)
                 isGameWin = checkWin()
                 loadNextLevel(movements)
                 delay(16)
             }
             stopActorsMovements()
             pauseSirenSound()
+            // this in case of some sounds are reproducing
             SoundService.stopSound(R.raw.pacman_intro)
             SoundService.stopSound(R.raw.pacman_energizer_mode)
             TimeFlow.stop()
@@ -238,8 +242,7 @@ class Game(private var gameData: List<LevelStartData>) {
         scorer = 0
         dots = gameData[currentLevel].amountOfFood
         configureGhostAndPacmanLevelDefaults(currentLevel)
-        gameMap =
-            transformIntoCharMatrix(gameData[0].mapCharData, gameData[0].height, gameData[0].width)
+        gameMap = transformIntoCharMatrix(gameData[0].mapCharData, gameData[0].height, gameData[0].width)
         resetPositions(currentLevel)
     }
 

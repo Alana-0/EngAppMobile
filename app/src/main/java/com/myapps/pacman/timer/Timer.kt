@@ -6,7 +6,6 @@ class Timer {
     private var isPaused = false
     private var isStarted = false
 
-
     fun start() {
         isStarted = true
         isPaused = false

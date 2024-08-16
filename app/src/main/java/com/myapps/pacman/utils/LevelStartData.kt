@@ -1,6 +1,5 @@
 package com.myapps.pacman.utils
 
-import com.myapps.pacman.utils.Position
 
 data class LevelStartData(
     val mapCharData:List<String>,

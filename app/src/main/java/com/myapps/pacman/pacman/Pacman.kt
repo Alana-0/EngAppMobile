@@ -95,7 +95,7 @@ class Pacman(
                 if (position.positionY == -1) {
                     currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
                     true
-                }else false
+                } else false
             }
 
             Direction.UP -> {

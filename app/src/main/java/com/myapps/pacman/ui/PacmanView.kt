@@ -1,14 +1,10 @@
 package com.myapps.pacman.ui
 
 import android.content.Context
-import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.RectF
-import android.graphics.Shader
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
@@ -19,8 +15,6 @@ import com.myapps.pacman.R
 import com.myapps.pacman.flowData.BoardData
 import com.myapps.pacman.flowData.GhostData
 import com.myapps.pacman.flowData.PacmanData
-import com.myapps.pacman.utils.Position
-import com.myapps.pacman.utils.transformIntoCharMatrix
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,23 +22,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import kotlin.math.floor
 
 
-class PacmanView /*@JvmOverloads constructor*/(
+class PacmanView(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
-    // pacman variables
+
     //pacman mouth
     private var mouthOpen = true
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var coroutineScope = CoroutineScope(Dispatchers.Main)
+
     private var runnable: Runnable = object : Runnable {
         override fun run() {
-            mouthOpen = !mouthOpen // Alterna entre abierto y cerrado
-            invalidate() // Redibuja la vista
-            handler.postDelayed(this, 200) // Vuelve a ejecutar después de un retraso
+            mouthOpen = !mouthOpen
+            invalidate()
+            handler.postDelayed(this, 200)
         }
     }
 
@@ -52,7 +46,7 @@ class PacmanView /*@JvmOverloads constructor*/(
         color = Color.YELLOW
     }
 
-    //game elements
+    //game view elements painters
     private var scorerPaint = Paint().apply {
         color = Color.WHITE
         strokeWidth = 20f
@@ -108,23 +102,23 @@ class PacmanView /*@JvmOverloads constructor*/(
     }
 
     private val borderPaint = Paint().apply {
-        color = Color.WHITE  // El color del borde
-        style = Paint.Style.STROKE  // Definir el estilo como STROKE para dibujar solo el borde
-        strokeWidth = 10f  // Grosor del borde
+        color = Color.WHITE
+        style = Paint.Style.STROKE
+        strokeWidth = 10f
     }
 
     //game variables
     private var scorer = 0
-    private var pacmanLives = 3
+    private var pacmanLives = 0
 
     //blinky variables
-    private var blinkyPosition =  Pair(-1f, -1f)
+    private var blinkyPosition = Pair(-1f, -1f)
     private var targetBlinky = blinkyPosition
     private var blinkyDirection = Direction.NOWHERE
     private var blinkyIsAlive = true
 
     //pacman variables
-    private var pacmanPosition =Pair(-1f, -1f)
+    private var pacmanPosition = Pair(-1f, -1f)
     private var pacmanEnergizerState = false
     private var pacmanTarget = pacmanPosition
     private var pacmanDirection = Direction.RIGHT
@@ -147,7 +141,7 @@ class PacmanView /*@JvmOverloads constructor*/(
     private var clydeDirection = Direction.RIGHT
     private var clydeIsAlive = true
 
-    // interpolations Jobs
+    // interpolations Jobs (this is with the purpose to make pacman and ghost movements pleasent to the eye)
     private var pacmanInterpolationJob: Job? = null
     private var blinkyInterpolationJob: Job? = null
     private var inkyInterpolationJob: Job? = null
@@ -155,7 +149,7 @@ class PacmanView /*@JvmOverloads constructor*/(
     private var clydeInterpolationJob: Job? = null
 
 
-    private var mapMatrix = Matrix<Char>(0,0)
+    private var mapMatrix = Matrix<Char>(0, 0)
 
     init {
         handler.post(runnable)
@@ -169,15 +163,14 @@ class PacmanView /*@JvmOverloads constructor*/(
                     Pair(data.position.positionX.toFloat(), data.position.positionY.toFloat())
                 pacmanDirection = data.direction
 
-                if(shouldInterpolatePosition(pacmanPosition,pacmanTarget)){
+                if (shouldInterpolatePosition(pacmanPosition, pacmanTarget)) {
                     startPacmanInterpolation(
                         pacmanPosition,
                         pacmanTarget,
                         pacmanData.value.direction,
                         getStepsBySpeedDelay(data.movementsDelay)
                     )
-                }
-                else{
+                } else {
                     pacmanPosition = pacmanTarget
                     invalidate()
                 }
@@ -216,15 +209,14 @@ class PacmanView /*@JvmOverloads constructor*/(
                 targetBlinky =
                     Pair(blinky.position.positionX.toFloat(), blinky.position.positionY.toFloat())
                 blinkyDirection = blinky.direction
-                if(shouldInterpolatePosition(blinkyPosition,targetBlinky)){
+                if (shouldInterpolatePosition(blinkyPosition, targetBlinky)) {
                     startBlinkyInterpolation(
                         blinkyPosition,
                         targetBlinky,
                         blinky.direction,
                         getStepsBySpeedDelay(blinky.speedDelay)
                     )
-                }
-                else{
+                } else {
                     blinkyPosition = targetBlinky
                     invalidate()
                 }
@@ -239,15 +231,14 @@ class PacmanView /*@JvmOverloads constructor*/(
                 targetInky =
                     Pair(inky.position.positionX.toFloat(), inky.position.positionY.toFloat())
                 inkyDirection = inky.direction
-                if(shouldInterpolatePosition(inkyPosition,targetInky)){
+                if (shouldInterpolatePosition(inkyPosition, targetInky)) {
                     startInkyInterpolation(
                         inkyPosition,
                         targetInky,
                         inky.direction,
                         getStepsBySpeedDelay(inky.speedDelay)
                     )
-                }
-                else{
+                } else {
                     inkyPosition = targetInky
                     invalidate()
                 }
@@ -262,15 +253,14 @@ class PacmanView /*@JvmOverloads constructor*/(
                 targetPinky =
                     Pair(pinky.position.positionX.toFloat(), pinky.position.positionY.toFloat())
                 pinkyDirection = pinky.direction
-                if(shouldInterpolatePosition(pinkyPosition,targetPinky)){
+                if (shouldInterpolatePosition(pinkyPosition, targetPinky)) {
                     startPinkyInterpolation(
                         pinkyPosition,
                         targetPinky,
                         pinky.direction,
                         getStepsBySpeedDelay(pinky.speedDelay)
                     )
-                }
-                else{
+                } else {
                     pinkyPosition = targetPinky
                     invalidate()
                 }
@@ -286,15 +276,14 @@ class PacmanView /*@JvmOverloads constructor*/(
                     Pair(clyde.position.positionX.toFloat(), clyde.position.positionY.toFloat())
                 clydeDirection = clyde.direction
 
-                if(shouldInterpolatePosition(clydePosition,targetClyde)){
+                if (shouldInterpolatePosition(clydePosition, targetClyde)) {
                     startClydeInterpolation(
                         clydePosition,
                         targetClyde,
                         clyde.direction,
                         getStepsBySpeedDelay(clyde.speedDelay)
                     )
-                }
-                else{
+                } else {
                     clydePosition = targetClyde
                     invalidate()
                 }
@@ -303,13 +292,14 @@ class PacmanView /*@JvmOverloads constructor*/(
     }
 
 
-    fun stopAllInterpolationJobs(){
+    fun stopAllInterpolationJobs() {
         pacmanInterpolationJob?.cancel()
         blinkyInterpolationJob?.cancel()
         inkyInterpolationJob?.cancel()
         pinkyInterpolationJob?.cancel()
         clydeInterpolationJob?.cancel()
     }
+
 
     private fun startBlinkyInterpolation(
         start: Pair<Float, Float>,
@@ -443,34 +433,33 @@ class PacmanView /*@JvmOverloads constructor*/(
         pupilColor: Paint,
         direction: Direction
     ) {
-        val bodyHeight = size
         val headRadius = size / 2
         val waveRadius = headRadius / 4
 
-        // Dibuja la cabeza (arco)
+        // draw the head of the ghost(arc)
         val headPath = Path().apply {
             addArc(
                 cx - headRadius,
-                cy - bodyHeight / 2,
+                cy - size / 2,
                 cx + headRadius,
-                cy + headRadius - bodyHeight / 2,
+                cy + headRadius - size / 2,
                 180f,
                 180f
             )
-            lineTo(cx + headRadius, cy + bodyHeight / 2 - waveRadius)
+            lineTo(cx + headRadius, cy + size / 2 - waveRadius)
             var waveCx = cx + headRadius
             var wave = true
             while (waveCx >= cx - headRadius) {
-                lineTo(waveCx, cy + bodyHeight / 2 + if (wave) waveRadius else -waveRadius)
+                lineTo(waveCx, cy + size / 2 + if (wave) waveRadius else -waveRadius)
                 wave = !wave
                 waveCx -= waveRadius
             }
-            lineTo(cx - headRadius, cy + bodyHeight / 2 - waveRadius)
+            lineTo(cx - headRadius, cy + size / 2 - waveRadius)
             close()
         }
         canvas.drawPath(headPath, ghostPaint)
 
-        // Dibuja los ojos
+        // draw the eyes of the ghost
         val eyeRadius = headRadius / 3
         val eyeOffsetX = headRadius / 2.5f
         val eyeOffsetY = headRadius / 3
@@ -503,33 +492,36 @@ class PacmanView /*@JvmOverloads constructor*/(
         )
     }
 
-    private fun drawBell(canvas: Canvas, centerX: Float, centerY: Float, bellWidth: Float, bellHeight: Float) {
+    private fun drawBell(
+        canvas: Canvas,
+        centerX: Float,
+        centerY: Float,
+        bellWidth: Float,
+        bellHeight: Float
+    ) {
         val top = centerY - bellHeight / 2
         val bottom = centerY + bellHeight / 2
 
-        // Crear un Path para la campana completa
         val path = Path().apply {
-            // Inicio de la campana en la parte superior izquierda
             moveTo(centerX - bellWidth / 2, top + bellHeight / 4)
-
-            // Línea curva hacia arriba (parte superior de la campana)
             quadTo(centerX, top - bellHeight / 4, centerX + bellWidth / 2, top + bellHeight / 4)
-
-            // Línea curva hacia abajo (parte lateral de la campana)
             lineTo(centerX + bellWidth / 2, bottom - bellHeight / 6)
-
-            // Parte inferior curva
-            quadTo(centerX, bottom + bellHeight / 8, centerX - bellWidth / 2, bottom - bellHeight / 6)
-
-            // Cerrar la forma de la campana
+            quadTo(
+                centerX,
+                bottom + bellHeight / 8,
+                centerX - bellWidth / 2,
+                bottom - bellHeight / 6
+            )
             close()
         }
 
-        // Dibujar la campana completa
-        canvas.drawPath(path,bellPaint)
+        canvas.drawPath(path, bellPaint)
         canvas.drawCircle(centerX, bottom - bellHeight / 8, bellHeight / 8, bellPaint)
     }
 
+
+    // this will depend on how much smoother you want the animation and
+    // the delay used in the actors movements
     private fun getStepsBySpeedDelay(speedDelay: Long): Int {
         if (speedDelay == 100L) return 5
         if (speedDelay == 150L) return 7
@@ -542,9 +534,12 @@ class PacmanView /*@JvmOverloads constructor*/(
         return 10
     }
 
-    private fun shouldInterpolatePosition(positionOne:Pair<Float,Float>,positionTwo:Pair<Float,Float>):Boolean{
-        if(abs(positionOne.first-positionTwo.first)>2f) return false
-        if(abs(positionOne.second-positionTwo.second)>2f) return false
+    private fun shouldInterpolatePosition(
+        positionOne: Pair<Float, Float>,
+        positionTwo: Pair<Float, Float>
+    ): Boolean {
+        if (abs(positionOne.first - positionTwo.first) > 2f) return false
+        if (abs(positionOne.second - positionTwo.second) > 2f) return false
         return true
     }
 
@@ -552,7 +547,7 @@ class PacmanView /*@JvmOverloads constructor*/(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val cellSize: Float = width.toFloat() / 28  // Assuming square cells
+        val cellSize: Float = width.toFloat() / 28  // assuming square cells
 
         // Draw the map
         for (i in 0 until mapMatrix.getRows()) {
@@ -579,9 +574,16 @@ class PacmanView /*@JvmOverloads constructor*/(
                             energizer
                         )
                     }
-                    'b'->{
+
+                    'b' -> {
                         canvas.drawRect(left, top, right, bottom, emptySpace)
-                        drawBell(canvas,(left + right) / 2, (top + bottom) / 2,cellSize*0.6f,cellSize*0.8f)
+                        drawBell(
+                            canvas,
+                            (left + right) / 2,
+                            (top + bottom) / 2,
+                            cellSize * 0.6f,
+                            cellSize * 0.8f
+                        )
                     }
 
                     ' ', '-' -> canvas.drawRect(left, top, right, bottom, emptySpace)
@@ -600,18 +602,16 @@ class PacmanView /*@JvmOverloads constructor*/(
         // draw scorer
         val left = (1 * cellSize)
         val top = (1 * cellSize)
-        var right = left + cellSize
-        var bottom = top + cellSize
         canvas.drawText("Scorer  $scorer", top, left, scorerPaint)
 
         // draw pacman lives
-        val left1 = (1 * cellSize).toFloat()
-        val top1 = (35 * cellSize).toFloat()
+        val left1 = (1 * cellSize)
+        val top1 = (35 * cellSize)
         val bottom1 = top1 + cellSize
 
         for (i in 1..pacmanLives) {
             val leftLive =
-                left1 + (i - 1) * (cellSize + 10) // Ajusta la posición de cada vida de Pacman
+                left1 + (i - 1) * (cellSize + 10) //adjust the position of pacman lives
             val rightLive = leftLive + cellSize
             canvas.drawArc(
                 leftLive,
@@ -624,6 +624,8 @@ class PacmanView /*@JvmOverloads constructor*/(
                 pacmanPaint
             )
         }
+
+        // drawing the pacman actors
 
         // Draw Pacman
         val pacmanLeft = (pacmanPosition.second * cellSize)
@@ -640,7 +642,8 @@ class PacmanView /*@JvmOverloads constructor*/(
                         pacmanTop,
                         pacmanRight,
                         pacmanBottom,
-                        45f, 270f,
+                        45f,
+                        270f,
                         true,
                         pacmanPaint
                     )
@@ -709,7 +712,7 @@ class PacmanView /*@JvmOverloads constructor*/(
             canvas,
             (blikyRight + blinkyLeft) / 2,
             (blinkyTop + blinkyBottom) / 2,
-            cellSize.toFloat(),
+            cellSize,
             if (!blinkyIsAlive) {
                 emptySpace
             } else {

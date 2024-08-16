@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 
-class GameMainView /*@JvmOverloads constructor*/(
+class GameMainView(
     context: Context, attrs: AttributeSet? = null
 ) : View(context,attrs){
 

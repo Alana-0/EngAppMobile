@@ -25,7 +25,6 @@ fun getAmountOfFood(strings: List<String>): Int {
             } else amountOfFood
         }
     }
-
     return amountOfFood
 }
 

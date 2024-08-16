@@ -5,13 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.myapps.pacman.flowData.BoardData
 import com.myapps.pacman.flowData.GhostData
 import com.myapps.pacman.flowData.PacmanData
-import com.myapps.pacman.utils.CharMaps
+import com.myapps.pacman.game.Game
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.LevelsData
 import com.myapps.pacman.utils.Position
-import com.myapps.pacman.utils.getAmountOfFood
 import com.myapps.pacman.utils.matrix.Matrix
-import com.myapps.pacman.utils.transformIntoCharMatrix
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -166,7 +164,6 @@ class PacmanGameViewModel : ViewModel() {
                     _positionList.removeAt(1)
                 }
             }
-
             is PacmanEvents.Start->{
                 startGame()
             }

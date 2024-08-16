@@ -9,7 +9,6 @@ object SoundService {
 
     private lateinit var audioAttributes:AudioAttributes
     private lateinit var soundPool: SoundPool
-
     private lateinit var soundMap: MutableMap<Int, Int>
 
     fun init(context: Context){
