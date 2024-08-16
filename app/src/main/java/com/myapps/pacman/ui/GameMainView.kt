@@ -9,13 +9,8 @@ import android.view.View
 
 class GameMainView(
     context: Context, attrs: AttributeSet? = null
-) : View(context,attrs){
+) : View(context, attrs) {
 
-    private val borderPaint = Paint().apply {
-        color = Color.WHITE
-        style = Paint.Style.STROKE
-        strokeWidth = 10f
-    }
 
     private val backScreenPaint = Paint().apply {
         color = Color.BLACK
@@ -30,7 +25,7 @@ class GameMainView(
     }
 
     private val textPaint = Paint().apply {
-        color  = Color.WHITE
+        color = Color.WHITE
         textSize = 50f
         textAlign = Paint.Align.CENTER
         isAntiAlias = true
@@ -38,8 +33,7 @@ class GameMainView(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawRect(0f,0f,width.toFloat(),height.toFloat(),backScreenPaint)
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), borderPaint)
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backScreenPaint)
         canvas.drawText("Pac-Man", width / 2f, 200f, titlePaint)
         canvas.drawText("Press Start To Play", width / 2f, height / 2f + 25f, textPaint)
     }

@@ -19,9 +19,7 @@ open class Ghost(
     private var mode: GhostMode = GhostMode.CHASE,
     var homeXRange: IntRange,
     var homeYRange: IntRange,
-    var direction: Direction,
-    var movementsDelay: Long,
-    var standardBaseDelay: Long
+    var direction: Direction
 ) {
 
 
@@ -31,7 +29,6 @@ open class Ghost(
             this.target = home
             if (this.currentPosition == home) {
                 this.lifeStatement = true
-                this.movementsDelay = standardBaseDelay
             }
             return false
         }
@@ -43,7 +40,7 @@ open class Ghost(
             }
             return false
         }
-        if (isInHome(homeXRange, homeYRange) && lifeStatement) {
+        if (isInHome(homeXRange, homeYRange) && lifeStatement && !pacman.energizerStatus) {
             canUseDoor = true;
             target = doorTarget
             return false;
@@ -84,7 +81,7 @@ open class Ghost(
         return (mapElement == '|' || (mapElement == '=' && !canUseDoor))
     }
 
-    private fun getGhostPossiblePosition(position: Position, direction: Direction): Position =
+    fun getGhostPossiblePosition(position: Position, direction: Direction): Position =
         when (direction) {
             Direction.RIGHT -> position.copy(positionY = position.positionY + 1)
             Direction.LEFT -> position.copy(positionY = position.positionY - 1)

@@ -1,6 +1,6 @@
 package com.myapps.pacman.timer
 
-class Timer {
+class Timer() {
     private var startTicks = 0
     private var pausedTicks = 0
     private var isPaused = false

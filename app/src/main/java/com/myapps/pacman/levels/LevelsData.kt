@@ -1,4 +1,7 @@
-package com.myapps.pacman.utils
+package com.myapps.pacman.levels
+
+import com.myapps.pacman.utils.Position
+import com.myapps.pacman.utils.getAmountOfFood
 
 object LevelsData {
     val pacmanGame = listOf(
@@ -20,7 +23,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(27, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapOne),
-            blinkySpeedDelay = 200L,
+            blinkySpeedDelay = 250,
             isBell = true
         ),
         LevelStartData(
@@ -41,7 +44,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapTwo),
-            blinkySpeedDelay = 190L,
+            blinkySpeedDelay = 240,
             isBell = false
         ),
         LevelStartData(
@@ -62,7 +65,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapThree),
-            blinkySpeedDelay = 190L,
+            blinkySpeedDelay = 240,
             isBell = true
         ),
         LevelStartData(
@@ -83,7 +86,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapFour),
-            blinkySpeedDelay = 180L,
+            blinkySpeedDelay = 230,
             isBell = false
         ),
         LevelStartData(
@@ -104,7 +107,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapFive),
-            blinkySpeedDelay = 170L,
+            blinkySpeedDelay = 220,
             isBell = true
         ),
         LevelStartData(
@@ -125,7 +128,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapSix),
-            blinkySpeedDelay = 160L,
+            blinkySpeedDelay = 210,
             isBell = true
         ),
         LevelStartData(
@@ -146,7 +149,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapSeven),
-            blinkySpeedDelay = 160L,
+            blinkySpeedDelay = 210,
             isBell = true
         ),
         LevelStartData(
@@ -167,7 +170,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapEight),
-            blinkySpeedDelay = 150L,
+            blinkySpeedDelay = 200,
             isBell = false
         ),
         LevelStartData(
@@ -188,7 +191,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapNine),
-            blinkySpeedDelay = 150L,
+            blinkySpeedDelay = 200,
             isBell = false
         ),
         LevelStartData(
@@ -209,7 +212,7 @@ object LevelsData {
             height = 36,
             pacmanDefaultPosition = Position(26, 14),
             amountOfFood = getAmountOfFood(CharMaps.mapTen),
-            blinkySpeedDelay = 150L,
+            blinkySpeedDelay = 200,
             isBell = false
         )
     )

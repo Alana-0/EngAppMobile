@@ -1,67 +1,87 @@
 package com.myapps.pacman.pacman
 
-import com.myapps.pacman.ghost.Ghost
+import com.myapps.pacman.timer.ActorsMovementsTimerController
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.Position
 import com.myapps.pacman.utils.TypeOfCollision
 import com.myapps.pacman.utils.matrix.Matrix
-import kotlinx.coroutines.Delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class Pacman(
     var direction: Direction = Direction.RIGHT,
     var lifeStatement: Boolean = true,
     var energizerStatus: Boolean = false,
     var currentPosition: Position,
-    var movementsDelay: Long
+    private val actorsMovementsTimerController: ActorsMovementsTimerController
 ) {
 
-    fun updatePosition(
+
+   suspend fun startMoving(
+       movements: MutableList<Direction>,
+       currentMap: () -> Matrix<Char>,
+       onFoodCollision: (Position, TypeOfCollision) -> Unit,
+       onGhostCollision: (Position) -> Boolean,
+       onUpdatingMoveAndDirection: () -> Unit
+   ){
+       actorsMovementsTimerController.controlTime(ActorsMovementsTimerController.PACMAN_ENTITY_TYPE){
+           return@controlTime updatePosition(
+               movements,
+               currentMap(),
+               onFoodCollision,
+               onGhostCollision,
+               onUpdatingMoveAndDirection
+           )
+       }
+   }
+   private fun updatePosition(
         movements: MutableList<Direction>,
         currentMap: Matrix<Char>,
         onFoodCollision: (Position, TypeOfCollision) -> Unit,
-        onGhostCollision: (Pacman) -> Unit
-    ) {
+        onGhostCollision: (Position) -> Boolean,
+        onUpdatingMoveAndDirection: () -> Unit
+   ):Boolean {
         var position = getPacmanPossiblePosition(currentPosition, movements[0])
 
         if (!isWallCollision(position, currentMap)) {
             this.move(movements[0])
             this.direction = movements[0]
+            onUpdatingMoveAndDirection()
             onFoodCollision(
                 this.currentPosition,
                 checkFoodCollisions(this.currentPosition, currentMap)
             )
-            onGhostCollision(this)
-            if(this.checkTransfer(this.currentPosition, this.direction, currentMap)){
+            if(onGhostCollision(this.currentPosition)) return true
+            if (this.checkTransfer(this.currentPosition, this.direction, currentMap)) {
                 onFoodCollision(
                     this.currentPosition,
                     checkFoodCollisions(this.currentPosition, currentMap)
                 )
-                onGhostCollision(this)
+                if(onGhostCollision(this.currentPosition)) return true
             }
         }
+
 
         if (movements.size > 1 && movements[0] != movements[1]) {
             position = getPacmanPossiblePosition(currentPosition, movements[1])
             if (!isWallCollision(position, currentMap)) {
                 this.move(movements[1])
                 this.direction = movements[1]
+                onUpdatingMoveAndDirection()
+                if(onGhostCollision(this.currentPosition)) return true
                 onFoodCollision(
                     this.currentPosition,
                     checkFoodCollisions(this.currentPosition, currentMap)
                 )
-                onGhostCollision(this)
-                if(this.checkTransfer(this.currentPosition, this.direction, currentMap)){
+                if (this.checkTransfer(this.currentPosition, this.direction, currentMap)) {
                     onFoodCollision(
                         this.currentPosition,
                         checkFoodCollisions(this.currentPosition, currentMap)
                     )
-                    onGhostCollision(this)
+                    if(onGhostCollision(this.currentPosition)) return true
                 }
                 movements.removeAt(0)
             }
         }
+       return false
     }
 
     private fun getPacmanPossiblePosition(position: Position, direction: Direction): Position =
@@ -84,34 +104,34 @@ class Pacman(
         direction: Direction,
         currentMap: Matrix<Char>
     ): Boolean = when (direction) {
-            Direction.RIGHT -> {
-                if (position.positionY == currentMap.getColumns()) {
-                    currentPosition = currentPosition.copy(positionY = 0)
-                    true
-                } else false
-            }
-
-            Direction.LEFT -> {
-                if (position.positionY == -1) {
-                    currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
-                    true
-                } else false
-            }
-
-            Direction.UP -> {
-                false
-            }
-
-            Direction.DOWN -> {
-                false
-            }
-
-            Direction.NOWHERE -> {
-                false
-            }
+        Direction.RIGHT -> {
+            if (position.positionY == currentMap.getColumns()) {
+                currentPosition = currentPosition.copy(positionY = 0)
+                true
+            } else false
         }
 
-    fun move(direction: Direction) {
+        Direction.LEFT -> {
+            if (position.positionY == -1) {
+                currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
+                true
+            } else false
+        }
+
+        Direction.UP -> {
+            false
+        }
+
+        Direction.DOWN -> {
+            false
+        }
+
+        Direction.NOWHERE -> {
+            false
+        }
+    }
+
+    private fun move(direction: Direction) {
         when (direction) {
             Direction.RIGHT -> currentPosition =
                 currentPosition.copy(positionY = currentPosition.positionY + 1)
@@ -145,6 +165,4 @@ class Pacman(
             else -> TypeOfCollision.NONE
         }
     }
-
-
 }

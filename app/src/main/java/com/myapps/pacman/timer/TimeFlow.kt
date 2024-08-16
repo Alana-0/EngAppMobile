@@ -14,16 +14,22 @@ object TimeFlow {
 
     private var job: Job? = null
     private val scope = CoroutineScope(Dispatchers.Default)
+    private var isPaused = false
 
     fun init(){
         job?.cancel()
         job = scope.launch {
             while (isActive){
                 delay(1000)
-                currentTicks.incrementAndGet()
+                if(!isPaused){
+                    currentTicks.incrementAndGet()
+                }
             }
         }
     }
+
+    fun pauseUnpauseTime(){ isPaused = !isPaused }
+    fun resetCounter(){ currentTicks.set(0)}
 
     fun stop(){
         job?.cancel()

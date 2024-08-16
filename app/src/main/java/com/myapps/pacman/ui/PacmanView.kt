@@ -1,20 +1,25 @@
 package com.myapps.pacman.ui
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Paint.Align
 import android.graphics.Path
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
+import android.view.accessibility.AccessibilityNodeInfo
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.R
-import com.myapps.pacman.flowData.BoardData
-import com.myapps.pacman.flowData.GhostData
-import com.myapps.pacman.flowData.PacmanData
+import com.myapps.pacman.states.BoardData
+import com.myapps.pacman.states.GhostData
+import com.myapps.pacman.states.PacmanData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,11 +33,23 @@ class PacmanView(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
+    //external variables
+    private var soundIsMuted = false
+    private var gameIsPaused = false
+    private var gameIsLost = false
+    private var gameIsWin = false
 
     //pacman mouth
     private var mouthOpen = true
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var collectMapDataJob: Job? = null
+    private var collectPacmanDataJob: Job? = null
+    private var collectPinkyDataJob: Job? = null
+    private var collectBlinkyDataJob: Job? = null
+    private var collectInkyDataJob: Job? = null
+    private var collectClydeDataJob: Job? = null
+
 
     private var runnable: Runnable = object : Runnable {
         override fun run() {
@@ -42,70 +59,45 @@ class PacmanView(
         }
     }
 
-    private val pacmanPaint = Paint().apply {
-        color = Color.YELLOW
-    }
-
     //game view elements painters
-    private var scorerPaint = Paint().apply {
-        color = Color.WHITE
-        strokeWidth = 20f
-        textSize = 22f
-    }
-    private val blinkyPaint = Paint().apply {
-        color = Color.RED
-    }
-    private val pinkyPaint = Paint().apply {
-        color = resources.getColor(R.color.pink, resources.newTheme())
-    }
-    private val clydePaint = Paint().apply {
-        color = resources.getColor(R.color.orange, resources.newTheme())
-    }
-    private val inkyPaint = Paint().apply {
-        color = resources.getColor(R.color.lightBlue, resources.newTheme())
-    }
-    private val eyeWhitePaint = Paint().apply {
-        color = Color.WHITE
-        style = Paint.Style.FILL
-    }
-    private val eyeBluePaint = Paint().apply {
-        color = Color.BLUE
-        style = Paint.Style.FILL
-    }
-    private val emptySpace = Paint().apply {
-        color = Color.BLACK
-    }
-    private val frightenedGhostPaint = Paint().apply {
-        color = resources.getColor(R.color.darkBlue, resources.newTheme())
-    }
+    private val pacmanPaint = createPaint(color = Color.YELLOW)
+    private val scorerPaint = createPaint(color = Color.WHITE, strokeWidth = 20f, textSize = 22f, textAlign = Paint.Align.LEFT)
+    private val blinkyPaint = createPaint(color = Color.RED)
+    private val pinkyPaint = createPaint(color = resources.getColor(R.color.pink, resources.newTheme()))
+    private val clydePaint = createPaint(color =  resources.getColor(R.color.orange, resources.newTheme()))
+    private val inkyPaint = createPaint(color = resources.getColor(R.color.lightBlue, resources.newTheme()))
+    private val eyeWhitePaint = createPaint(color = Color.WHITE)
+    private val eyeBluePaint = createPaint(color = Color.BLUE)
+    private val emptySpace = createPaint(color = Color.BLACK)
+    private val frightenedGhostPaint = createPaint(color = resources.getColor(R.color.darkBlue, resources.newTheme()))
+    private var wallPaint = createPaint(color = Color.BLUE, strokeWidth = 3f)
+    private var food = createPaint(color = Color.WHITE, strokeWidth = 3f)
+    private var energizer = createPaint(color = Color.WHITE, strokeWidth = 20f)
+    private var doorPaint = createPaint(color = Color.WHITE)
+    private val bellPaint = createPaint(color = Color.YELLOW, isAntiAlias = true)
+    private val soundPaint = createPaint(color = Color.WHITE, strokeWidth = 20f, textSize = 22f, textAlign = Paint.Align.LEFT)
+    private val pauseScreenPaint = createPaint(color = resources.getColor(R.color.transparentBlack, resources.newTheme()))
+    private val pauseMessagePaint = createPaint(color = Color.WHITE, strokeWidth = 20f, textSize = 30f)
+    private val endGameScreenPaint = createPaint(color =  resources.getColor(R.color.littleTransparentBlack,resources.newTheme()))
+    private val endGameMessageScreenPaint = createPaint(color = Color.YELLOW, strokeWidth = 25f, textSize = 40f)
 
-    private var wallPaint = Paint().apply {
-        color = Color.BLUE
-        strokeWidth = 3f
-    }
-    private var food = Paint().apply {
-        color = Color.WHITE
-        strokeWidth = 3f
-    }
-    private var energizer = Paint().apply {
-        color = Color.WHITE
-        strokeWidth = 20f
-    }
-    private var doorPaint = Paint().apply {
-        color = Color.WHITE
-    }
 
-    private val bellPaint = Paint().apply {
-        color = Color.YELLOW
-        style = Paint.Style.FILL
-        isAntiAlias = true
-    }
-
-    private val borderPaint = Paint().apply {
-        color = Color.WHITE
-        style = Paint.Style.STROKE
-        strokeWidth = 10f
-    }
+    private fun createPaint(
+        color: Int = Color.BLACK,
+        style: Paint.Style = Paint.Style.FILL,
+        strokeWidth: Float = 0f,
+        textSize: Float = 0f,
+        isAntiAlias: Boolean = false,
+        textAlign:Align = Paint.Align.CENTER
+    ):Paint =
+        Paint().apply {
+            this.color = color
+            this.style = style
+            this.strokeWidth = strokeWidth
+            this.textSize = textSize
+            this.isAntiAlias = isAntiAlias
+            this.textAlign = textAlign
+        }
 
     //game variables
     private var scorer = 0
@@ -113,40 +105,28 @@ class PacmanView(
 
     //blinky variables
     private var blinkyPosition = Pair(-1f, -1f)
-    private var targetBlinky = blinkyPosition
     private var blinkyDirection = Direction.NOWHERE
     private var blinkyIsAlive = true
 
     //pacman variables
     private var pacmanPosition = Pair(-1f, -1f)
     private var pacmanEnergizerState = false
-    private var pacmanTarget = pacmanPosition
     private var pacmanDirection = Direction.RIGHT
 
     //pinky variables
     private var pinkyPosition = Pair(-1f, -1f)
-    private var targetPinky = pinkyPosition
     private var pinkyDirection = Direction.RIGHT
     private var pinkyIsAlive = true
 
     //inky variables
     private var inkyPosition = Pair(-1f, -1f)
-    private var targetInky = inkyPosition
     private var inkyDirection = Direction.RIGHT
     private var inkyIsAlive = true
 
     // clyde variables
     private var clydePosition = Pair(-1f, -1f)
-    private var targetClyde = clydePosition
     private var clydeDirection = Direction.RIGHT
     private var clydeIsAlive = true
-
-    // interpolations Jobs (this is with the purpose to make pacman and ghost movements pleasent to the eye)
-    private var pacmanInterpolationJob: Job? = null
-    private var blinkyInterpolationJob: Job? = null
-    private var inkyInterpolationJob: Job? = null
-    private var pinkyInterpolationJob: Job? = null
-    private var clydeInterpolationJob: Job? = null
 
 
     private var mapMatrix = Matrix<Char>(0, 0)
@@ -155,36 +135,16 @@ class PacmanView(
         handler.post(runnable)
     }
 
-    fun setPacmanData(pacmanData: StateFlow<PacmanData>) {
-        coroutineScope.launch {
-            pacmanData.collect { data ->
-                pacmanEnergizerState = data.isEnergizer
-                pacmanTarget =
-                    Pair(data.position.positionX.toFloat(), data.position.positionY.toFloat())
-                pacmanDirection = data.direction
-
-                if (shouldInterpolatePosition(pacmanPosition, pacmanTarget)) {
-                    startPacmanInterpolation(
-                        pacmanPosition,
-                        pacmanTarget,
-                        pacmanData.value.direction,
-                        getStepsBySpeedDelay(data.movementsDelay)
-                    )
-                } else {
-                    pacmanPosition = pacmanTarget
-                    invalidate()
-                }
-            }
-        }
-    }
-
-    fun setGameMapFlow(gameMapFlow: StateFlow<BoardData>) {
-        coroutineScope.launch {
-            gameMapFlow.collect { boardData ->
-                mapMatrix = boardData.charData
-                scorer = boardData.scorer
-                pacmanLives = boardData.pacmanLives
-                wallPaint.color = when (boardData.currentLevel) {
+    fun setGameBoardData(gameBoardData: StateFlow<BoardData>) {
+        collectMapDataJob?.cancel()
+        collectMapDataJob = coroutineScope.launch {
+            gameBoardData.collect {
+                mapMatrix = it.gameBoardData
+                scorer = it.scorer
+                pacmanLives = it.pacmanLives
+                gameIsLost = it.isGameLose
+                gameIsWin = it.isGameWin
+                wallPaint.color = when (it.currentLevel) {
                     0 -> Color.BLUE
                     1 -> resources.getColor(R.color.levelOne, resources.newTheme())
                     2 -> resources.getColor(R.color.levelTwo, resources.newTheme())
@@ -202,226 +162,229 @@ class PacmanView(
         }
     }
 
-    fun setBlinkyFlow(blinkyFlow: StateFlow<GhostData>) {
-        coroutineScope.launch {
-            blinkyFlow.collect { blinky ->
-                blinkyIsAlive = blinky.lifeStatement
-                targetBlinky =
-                    Pair(blinky.position.positionX.toFloat(), blinky.position.positionY.toFloat())
-                blinkyDirection = blinky.direction
-                if (shouldInterpolatePosition(blinkyPosition, targetBlinky)) {
-                    startBlinkyInterpolation(
+    fun setPacmanData(pacmanData: StateFlow<PacmanData>) {
+        collectPacmanDataJob?.cancel()
+        collectPacmanDataJob = coroutineScope.launch {
+            pacmanData.collect {
+                pacmanEnergizerState = it.energizerStatus
+                pacmanDirection = it.pacmanDirection
+               if (shouldAnimate(pacmanPosition, it.pacmanPosition)) {
+                   animateActorTo(
+                       pacmanPosition,
+                       it.pacmanPosition,
+                       pacmanDirection,
+                       it.speedDelay
+                   ){
+                           pair ->
+                       pacmanPosition = pair
+                   }
+                } else {
+                    pacmanPosition = it.pacmanPosition
+                    invalidate()
+                }
+            }
+        }
+    }
+
+    fun setBlinkyData(blinkyData: StateFlow<GhostData>) {
+        collectBlinkyDataJob?.cancel()
+        collectBlinkyDataJob = coroutineScope.launch {
+            blinkyData.collect {
+                blinkyDirection = it.ghostDirection
+                blinkyIsAlive = it.ghostLifeStatement
+                if (shouldAnimate(blinkyPosition, it.ghostPosition)) {
+                    animateActorTo(
                         blinkyPosition,
-                        targetBlinky,
-                        blinky.direction,
-                        getStepsBySpeedDelay(blinky.speedDelay)
-                    )
+                        it.ghostPosition,
+                        blinkyDirection,
+                        it.ghostDelay
+                    ){
+                            pair ->
+                        blinkyPosition = pair
+                    }
                 } else {
-                    blinkyPosition = targetBlinky
+                    blinkyPosition = it.ghostPosition
                     invalidate()
                 }
             }
         }
     }
 
-    fun setInkyFlow(inkyFlow: StateFlow<GhostData>) {
-        coroutineScope.launch {
-            inkyFlow.collect { inky ->
-                inkyIsAlive = inky.lifeStatement
-                targetInky =
-                    Pair(inky.position.positionX.toFloat(), inky.position.positionY.toFloat())
-                inkyDirection = inky.direction
-                if (shouldInterpolatePosition(inkyPosition, targetInky)) {
-                    startInkyInterpolation(
+    fun setInkyData(inkyData: StateFlow<GhostData>) {
+        collectInkyDataJob?.cancel()
+        collectInkyDataJob = coroutineScope.launch {
+            inkyData.collect {
+                inkyDirection = it.ghostDirection
+                inkyIsAlive = it.ghostLifeStatement
+                if (shouldAnimate(inkyPosition, it.ghostPosition)) {
+                    animateActorTo(
                         inkyPosition,
-                        targetInky,
-                        inky.direction,
-                        getStepsBySpeedDelay(inky.speedDelay)
-                    )
+                        it.ghostPosition,
+                        inkyDirection,
+                        it.ghostDelay
+                    ){
+                            pair ->
+                        inkyPosition = pair
+                    }
                 } else {
-                    inkyPosition = targetInky
+                    inkyPosition = it.ghostPosition
                     invalidate()
                 }
             }
         }
     }
 
-    fun setPinkyFlow(pinkyFlow: StateFlow<GhostData>) {
-        coroutineScope.launch {
-            pinkyFlow.collect { pinky ->
-                pinkyIsAlive = pinky.lifeStatement
-                targetPinky =
-                    Pair(pinky.position.positionX.toFloat(), pinky.position.positionY.toFloat())
-                pinkyDirection = pinky.direction
-                if (shouldInterpolatePosition(pinkyPosition, targetPinky)) {
-                    startPinkyInterpolation(
+    fun setPinkyData(pinkyData: StateFlow<GhostData>) {
+        collectPinkyDataJob?.cancel()
+        collectPinkyDataJob = coroutineScope.launch {
+            pinkyData.collect {
+                pinkyDirection = it.ghostDirection
+                pinkyIsAlive = it.ghostLifeStatement
+                if (shouldAnimate(pinkyPosition, it.ghostPosition)) {
+                    animateActorTo(
                         pinkyPosition,
-                        targetPinky,
-                        pinky.direction,
-                        getStepsBySpeedDelay(pinky.speedDelay)
-                    )
+                        it.ghostPosition,
+                        pinkyDirection,
+                        it.ghostDelay
+                    ){
+                            pair ->
+                        pinkyPosition = pair
+                    }
                 } else {
-                    pinkyPosition = targetPinky
+                    pinkyPosition = it.ghostPosition
                     invalidate()
                 }
             }
         }
     }
 
-    fun setClydeFlow(clydeFlow: StateFlow<GhostData>) {
-        coroutineScope.launch {
-            clydeFlow.collect { clyde ->
-                clydeIsAlive = clyde.lifeStatement
-                targetClyde =
-                    Pair(clyde.position.positionX.toFloat(), clyde.position.positionY.toFloat())
-                clydeDirection = clyde.direction
-
-                if (shouldInterpolatePosition(clydePosition, targetClyde)) {
-                    startClydeInterpolation(
-                        clydePosition,
-                        targetClyde,
-                        clyde.direction,
-                        getStepsBySpeedDelay(clyde.speedDelay)
-                    )
+    fun setClydeData(clydeData: StateFlow<GhostData>) {
+        collectClydeDataJob?.cancel()
+        collectClydeDataJob = coroutineScope.launch {
+            clydeData.collect {
+                clydeDirection = it.ghostDirection
+                clydeIsAlive = it.ghostLifeStatement
+                if (shouldAnimate(clydePosition, it.ghostPosition)) {
+                    animateActorTo(
+                        startPosition = clydePosition,
+                        targetPosition = it.ghostPosition,
+                        direction = clydeDirection,
+                        speedDelay = it.ghostDelay
+                    ){
+                        pair ->
+                        clydePosition = pair
+                    }
                 } else {
-                    clydePosition = targetClyde
+                    clydePosition = it.ghostPosition
                     invalidate()
                 }
             }
         }
     }
 
-
-    fun stopAllInterpolationJobs() {
-        pacmanInterpolationJob?.cancel()
-        blinkyInterpolationJob?.cancel()
-        inkyInterpolationJob?.cancel()
-        pinkyInterpolationJob?.cancel()
-        clydeInterpolationJob?.cancel()
+    fun stopAllCurrentJobs() {
+        collectMapDataJob?.cancel()
+        collectPacmanDataJob?.cancel()
+        collectBlinkyDataJob?.cancel()
+        collectInkyDataJob?.cancel()
+        collectClydeDataJob?.cancel()
+        collectPinkyDataJob?.cancel()
     }
 
-
-    private fun startBlinkyInterpolation(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
+    private fun animateActorTo(
+        startPosition: Pair<Float, Float>,
+        targetPosition: Pair<Float, Float>,
         direction: Direction,
-        steps: Int,
+        speedDelay:Long,
+        updatePosition: (Pair<Float, Float>) -> Unit,
     ) {
-        blinkyInterpolationJob?.cancel()
-        blinkyInterpolationJob = coroutineScope.launch {
-            for (i in 1..steps) {
-                val fraction = i / steps.toFloat()
-                blinkyPosition = interpolatePosition(start, end, fraction, direction)
-                invalidate()
-                delay(16)  // Adjust delay for smoother/faster interpolation
-            }
-            blinkyPosition = end // Ensure final position is exact
-        }
-    }
+        val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = (speedDelay.times(0.9)).toLong()
 
-    private fun startInkyInterpolation(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
-        direction: Direction,
-        steps: Int,
-    ) {
-        inkyInterpolationJob?.cancel()
-        inkyInterpolationJob = coroutineScope.launch {
-            for (i in 1..steps) {
-                val fraction = i / steps.toFloat()
-                inkyPosition = interpolatePosition(start, end, fraction, direction)
+            addUpdateListener { animation ->
+                val progress = animation.animatedValue as Float
+                val newPosition =
+                    linearInterpolation(
+                        startPosition,
+                        targetPosition,
+                        progress,
+                        direction
+                    )
+                updatePosition(newPosition)
                 invalidate()
-                delay(16)  // Adjust delay for smoother/faster interpolation
             }
-            inkyPosition = end // Ensure final position is exact
-        }
-    }
 
-    private fun startPinkyInterpolation(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
-        direction: Direction,
-        steps: Int,
-    ) {
-        pinkyInterpolationJob?.cancel()
-        pinkyInterpolationJob = coroutineScope.launch {
-            for (i in 1..steps) {
-                val fraction = i / steps.toFloat()
-                pinkyPosition = interpolatePosition(start, end, fraction, direction)
-                invalidate()
-                delay(16)  // Adjust delay for smoother/faster interpolation
-            }
-            pinkyPosition = end // Ensure final position is exact
-        }
-    }
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationEnd(animation: Animator) {
+                    updatePosition(targetPosition)
+                    invalidate()
+                }
 
-    private fun startClydeInterpolation(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
-        direction: Direction,
-        steps: Int,
-    ) {
-        clydeInterpolationJob?.cancel()
-        clydeInterpolationJob = coroutineScope.launch {
-            for (i in 1..steps) {
-                val fraction = i / steps.toFloat()
-                clydePosition = interpolatePosition(start, end, fraction, direction)
-                invalidate()
-                delay(16)  // Adjust delay for smoother/faster interpolation
-            }
-            clydePosition = end // Ensure final position is exact
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            })
         }
-    }
 
-    private fun startPacmanInterpolation(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
-        direction: Direction,
-        steps: Int,
-    ) {
-        pacmanInterpolationJob?.cancel()
-        pacmanInterpolationJob = coroutineScope.launch {
-            for (i in 1..steps) {
-                val fraction = i / steps.toFloat()
-                pacmanPosition = interpolatePosition(start, end, fraction, direction)
-                invalidate()
-                delay(16) // Adjust delay for smoother/faster interpolation
-            }
-            pacmanPosition = end // Ensure final position is exact
-        }
+        animator.start()
     }
-
-    private fun interpolatePosition(
-        start: Pair<Float, Float>,
-        end: Pair<Float, Float>,
-        fraction: Float,
+    private fun linearInterpolation(
+        startPosition: Pair<Float, Float>,
+        endPosition: Pair<Float, Float>,
+        step: Float,
         direction: Direction
     ): Pair<Float, Float> =
         when (direction) {
             Direction.RIGHT -> {
-                val y = start.second + fraction * (end.second - start.second)
-                Pair(end.first, y)
+                Pair(
+                    endPosition.first,
+                    startPosition.second + step * (endPosition.second - startPosition.second)
+                )
             }
 
             Direction.LEFT -> {
-                val y = start.second + fraction * (end.second - start.second)
-                Pair(end.first, y)
+                Pair(
+                    endPosition.first,
+                    startPosition.second + step * (endPosition.second - startPosition.second)
+                )
             }
 
             Direction.UP -> {
-                val x = start.first + fraction * (end.first - start.first)
-                Pair(x, end.second)
+                Pair(
+                    startPosition.first + step * (endPosition.first - startPosition.first),
+                    endPosition.second
+                )
             }
 
             Direction.DOWN -> {
-                val x = start.first + fraction * (end.first - start.first)
-                Pair(x, end.second)
+                Pair(
+                    startPosition.first + step * (endPosition.first - startPosition.first),
+                    endPosition.second
+                )
             }
 
-            else -> {
-                start
+            Direction.NOWHERE -> {
+                Pair(endPosition.first, endPosition.second)
             }
         }
+    private fun shouldAnimate(
+        startPosition: Pair<Float, Float>,
+        endPosition: Pair<Float, Float>
+    ): Boolean {
+        if(startPosition == endPosition) return false
+        if (abs(startPosition.first - endPosition.first) > 2f) return false
+        if (abs(startPosition.second - endPosition.second) > 2f) return false
+        return true
+    }
+
+
+    fun changePauseGameStatus(pauseGame: Boolean) {
+        gameIsPaused = pauseGame
+    }
+
+    fun changeSoundGameStatus(soundActivate: Boolean) {
+        soundIsMuted = soundActivate
+    }
 
 
     private fun drawGhost(
@@ -520,30 +483,37 @@ class PacmanView(
     }
 
 
-    // this will depend on how much smoother you want the animation and
-    // the delay used in the actors movements
-    private fun getStepsBySpeedDelay(speedDelay: Long): Int {
-        if (speedDelay == 100L) return 5
-        if (speedDelay == 150L) return 7
-        if (speedDelay == 160L) return 8
-        if (speedDelay == 170L) return 8
-        if (speedDelay == 180L) return 9
-        if (speedDelay == 190L) return 9
-        if (speedDelay == 200L) return 10
-        if (speedDelay == 500L) return 35
-        return 10
+    private fun drawPauseScreen(
+        canvas: Canvas,
+        width: Float,
+        height: Float
+    ) {
+        canvas.drawRect(0f, 0f, width, height, pauseScreenPaint)
+        val xPos = width/2
+        val yPos = (height / 2 - (pauseMessagePaint.descent() + pauseMessagePaint.ascent()) / 2)
+        canvas.drawText("PAUSE",xPos,yPos,pauseMessagePaint)
     }
 
-    private fun shouldInterpolatePosition(
-        positionOne: Pair<Float, Float>,
-        positionTwo: Pair<Float, Float>
-    ): Boolean {
-        if (abs(positionOne.first - positionTwo.first) > 2f) return false
-        if (abs(positionOne.second - positionTwo.second) > 2f) return false
-        return true
+    private fun drawWinScreen(
+        canvas: Canvas,
+        width: Float,
+        height: Float
+    ){
+        canvas.drawRect(0f,0f,width,height,endGameScreenPaint)
+        val xPos = width/2
+        val yPos = (height / 2 - (endGameMessageScreenPaint.descent() + endGameMessageScreenPaint.ascent()) / 2)
+        canvas.drawText("YOU WIN",xPos,yPos,endGameMessageScreenPaint)
     }
-
-
+    private fun drawLoseScreen(
+        canvas: Canvas,
+        width: Float,
+        height: Float
+    ){
+        canvas.drawRect(0f,0f,width,height,endGameScreenPaint)
+        val xPos = width/2
+        val yPos = (height / 2 - (endGameMessageScreenPaint.descent() + endGameMessageScreenPaint.ascent()) / 2)
+        canvas.drawText("YOU LOSE",xPos,yPos,endGameMessageScreenPaint)
+    }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -597,6 +567,18 @@ class PacmanView(
             val right = left + cellSize
             val bottom = top + cellSize
             canvas.drawRect(left, top, right, bottom, emptySpace)
+        }
+
+
+        // draw sound Icon
+
+        val leftSpeaker = (22 * cellSize)
+        val topSpeaker = (1 * cellSize)
+
+        if (soundIsMuted) {
+            canvas.drawText("SOUND OFF", leftSpeaker, topSpeaker, soundPaint)
+        } else {
+            canvas.drawText("SOUND ON", leftSpeaker, topSpeaker, soundPaint)
         }
 
         // draw scorer
@@ -826,7 +808,33 @@ class PacmanView(
             },
             clydeDirection
         )
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), borderPaint)
+
+        if (gameIsPaused) {
+            drawPauseScreen(
+                canvas,
+                width = width.toFloat(),
+                height = height.toFloat(),
+            )
+        }
+        if(gameIsLost){
+            drawLoseScreen(
+                canvas,
+                width = width.toFloat(),
+                height = height.toFloat()
+            )
+        }
+        if(gameIsWin){
+            drawWinScreen(
+                canvas,
+                width = width.toFloat(),
+                height = height.toFloat()
+            )
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopAllCurrentJobs()
     }
 }
 

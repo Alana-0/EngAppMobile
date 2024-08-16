@@ -4,16 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.activity.viewModels
-import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.myapps.pacman.databinding.ActivityMainBinding
-import com.myapps.pacman.sound.SoundService
+import com.myapps.pacman.sound.PacmanSoundService
 import com.myapps.pacman.ui.GameMainView
 import com.myapps.pacman.ui.PacmanView
-import kotlinx.coroutines.Job
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<PacmanGameViewModel>()
@@ -21,13 +20,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding:ActivityMainBinding
     private lateinit var pacmanView: PacmanView
     private lateinit var gameMainView: GameMainView
+    private var isSoundMute = false
     private var gameIsStarted = false
+    private var gameIsPaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        SoundService.init(this)
         pacmanView = PacmanView(this)
         gameMainView = GameMainView(this)
 
@@ -38,21 +38,13 @@ class MainActivity : AppCompatActivity() {
         binding.pacmanView.removeAllViews()
         binding.pacmanView.addView(gameMainView,layoutParams)
 
-        lifecycleScope.launch {
-            pacmanView.setGameMapFlow(viewModel.pacMapping)
-            pacmanView.setBlinkyFlow(viewModel.blinkyPos)
-            pacmanView.setInkyFlow(viewModel.inkyPos)
-            pacmanView.setClydeFlow(viewModel.clydePos)
-            pacmanView.setPinkyFlow(viewModel.pinkyPos)
-            pacmanView.setPacmanData(viewModel.pacmanPos)
-        }
-
         configureDownButton()
         configureLeftButton()
         configureRightButton()
         configureUpButton()
-        configureStartButton()
-        configureStopButton()
+        configureStartResetButton()
+        configureSoundButton()
+        configurePauseResumeButton()
     }
 
 
@@ -80,39 +72,57 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureStartButton(){
-        binding.start.setOnClickListener {
-            if(!gameIsStarted){
-                val layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
+    private fun configureStartResetButton(){
+        binding.startResetButton.setOnClickListener {
+            val layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            gameIsStarted = if(gameIsStarted){
+                viewModel.onEvents(PacmanEvents.Stop)
+                binding.pacmanView.removeAllViews()
+                binding.pacmanView.addView(gameMainView,layoutParams)
+                false
+            } else{
                 viewModel.onEvents(PacmanEvents.Start)
                 binding.pacmanView.removeAllViews()
                 binding.pacmanView.addView(pacmanView,layoutParams)
-                gameIsStarted = true
+                pacmanView.setGameBoardData(viewModel.mapBoardData)
+                pacmanView.setPacmanData(viewModel.pacmanData)
+                pacmanView.setBlinkyData(viewModel.blinkyData)
+                pacmanView.setInkyData(viewModel.inkyData)
+                pacmanView.setPinkyData(viewModel.pinkyData)
+                pacmanView.setClydeData(viewModel.clydeData)
+                true
             }
         }
     }
 
-    private fun configureStopButton(){
-        binding.stopGame.setOnClickListener {
-            if(gameIsStarted){
-                val layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                viewModel.onEvents(PacmanEvents.Stop)
-                pacmanView.stopAllInterpolationJobs()
-                binding.pacmanView.removeAllViews()
-                binding.pacmanView.addView(gameMainView,layoutParams)
-                gameIsStarted = false
+    private fun configurePauseResumeButton(){
+        binding.pauseResetButton.setOnClickListener {
+            gameIsPaused = !gameIsPaused
+            pacmanView.changePauseGameStatus(gameIsPaused)
+
+            if(gameIsPaused){
+                viewModel.onEvents(PacmanEvents.Pause)
+            }
+            else{
+                viewModel.onEvents(PacmanEvents.Resume)
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        SoundService.release()
+
+    private fun configureSoundButton(){
+        binding.soundButton.setOnClickListener {
+            isSoundMute = !isSoundMute
+            pacmanView.changeSoundGameStatus(isSoundMute)
+            if(!isSoundMute){
+                viewModel.onEvents(PacmanEvents.RecoverSounds)
+            } else{
+                viewModel.onEvents(PacmanEvents.MuteSounds)
+            }
+        }
     }
+
 }

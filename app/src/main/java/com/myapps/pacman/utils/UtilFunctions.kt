@@ -1,5 +1,8 @@
 package com.myapps.pacman.utils
 
+import android.content.Context
+import android.media.AudioManager
+import androidx.core.content.getSystemService
 import com.myapps.pacman.utils.matrix.Matrix
 
 fun transformIntoCharMatrix(
@@ -27,4 +30,7 @@ fun getAmountOfFood(strings: List<String>): Int {
     }
     return amountOfFood
 }
+
+
+
 
