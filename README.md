@@ -5,7 +5,7 @@ all the main mechanics are the same than the original version._
 
 ## About the game
 The game contains ten different levels, all of them with its own map. All the maps are full with pellets and 
-four energizers (from level one to seven) wichs ones pacman should eat.
+four energizers (from level one to eight) wichs ones pacman should eat.
 Pacman has three lives, if it loses all of them, the game is lost. 
 In five of the ten levels, the red ghost will increase his speed and the only way for pacman to match that speed is 
 eating the five bells that will appear in some levels.
