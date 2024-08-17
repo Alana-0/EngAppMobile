@@ -19,16 +19,7 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 
 #### Here some screenshots of the app
 
-![level_one](https://github.com/user-attachments/assets/6db4bd9d-3931-4758-9dea-1bbabcc13b84)
-![level_two](https://github.com/user-attachments/assets/6bcd3a0a-f212-4cd3-8649-772bd2fbd980)
-![level_three](https://github.com/user-attachments/assets/05d9be40-575f-47cc-b483-3e02881eadcb)
-![level_four](https://github.com/user-attachments/assets/19b0ee5c-39a7-4c13-b9d5-f1e1bd15458e)
-![level_five](https://github.com/user-attachments/assets/9a9896b7-bbe5-431a-883f-2aae50ce384e)
-![level_six](https://github.com/user-attachments/assets/da6cb919-5478-416f-8111-be3e1d662b7b)
-![level_seven](https://github.com/user-attachments/assets/e1443143-076b-4d2b-9e57-42dd70ae0767)
-![level_eight](https://github.com/user-attachments/assets/8eb7f7da-a2cf-4908-b203-80ad6805dcbc)
-![level_nine](https://github.com/user-attachments/assets/42cf4163-87ac-48c5-a1c9-d725e3af236c)
-![level_ten](https://github.com/user-attachments/assets/1dd04fe0-2659-4ff1-8700-f76db2898dd3)
+
 
 
 
