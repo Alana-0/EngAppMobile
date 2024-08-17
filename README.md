@@ -19,16 +19,16 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 
 #### Here some screenshots of the app
 
-![level_one](https://github.com/user-attachments/assets/ef65f0a9-7092-4a99-9778-c49524b52387)
-![level_two](https://github.com/user-attachments/assets/64afe0d1-4da1-4f62-9da0-a3ce59a4b787)
-![level_three](https://github.com/user-attachments/assets/63904cfb-e347-4ead-abf9-497ea6694d1e)
-![level_four](https://github.com/user-attachments/assets/1d2f8945-e107-4922-a1c6-df475e6d4606)
-![level_five](https://github.com/user-attachments/assets/295d1e7a-6863-44b4-935a-22b35c5f9ee6)
-![level_six](https://github.com/user-attachments/assets/544125f4-256f-4969-b738-4b0e8e4334d8)
-![level_seven](https://github.com/user-attachments/assets/0d10c0f2-515c-4cab-b688-e0eb69e0cb8a)
-![level_eight](https://github.com/user-attachments/assets/466fe26b-579f-4314-a71c-244b4392276f)
-![level_nine](https://github.com/user-attachments/assets/e9d4f581-1bd8-4010-b295-9f2ca96277fe)
-![level_ten](https://github.com/user-attachments/assets/fe5e3566-d475-48bc-96a0-0a287011a773)
+![level_one](https://github.com/user-attachments/assets/6db4bd9d-3931-4758-9dea-1bbabcc13b84)
+![level_two](https://github.com/user-attachments/assets/6bcd3a0a-f212-4cd3-8649-772bd2fbd980)
+![level_three](https://github.com/user-attachments/assets/05d9be40-575f-47cc-b483-3e02881eadcb)
+![level_four](https://github.com/user-attachments/assets/19b0ee5c-39a7-4c13-b9d5-f1e1bd15458e)
+![level_five](https://github.com/user-attachments/assets/9a9896b7-bbe5-431a-883f-2aae50ce384e)
+![level_six](https://github.com/user-attachments/assets/da6cb919-5478-416f-8111-be3e1d662b7b)
+![level_seven](https://github.com/user-attachments/assets/e1443143-076b-4d2b-9e57-42dd70ae0767)
+![level_eight](https://github.com/user-attachments/assets/8eb7f7da-a2cf-4908-b203-80ad6805dcbc)
+![level_nine](https://github.com/user-attachments/assets/42cf4163-87ac-48c5-a1c9-d725e3af236c)
+![level_ten](https://github.com/user-attachments/assets/1dd04fe0-2659-4ff1-8700-f76db2898dd3)
 
 
 
