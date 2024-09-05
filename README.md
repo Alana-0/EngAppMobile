@@ -40,6 +40,7 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 * MVVM(Model-View-ViewModel) - Main Architecture pattern
 * Kotlin - The main language
 * Coroutines and Flows
+* JSON files for the data of the levels
 
 ## Authors ✒️
 
