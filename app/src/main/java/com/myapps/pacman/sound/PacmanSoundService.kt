@@ -43,13 +43,11 @@ class PacmanSoundService(context: Context) {
     private fun loadSounds(context: Context) {
         soundMap[R.raw.pacman_intro] = soundPool.load(context, R.raw.pacman_intro, 1)
         soundMap[R.raw.ghost_siren] = soundPool.load(context, R.raw.ghost_siren, 1)
-        soundMap[R.raw.pacman_energizer_mode] =
-            soundPool.load(context, R.raw.pacman_energizer_mode, 1)
+        soundMap[R.raw.pacman_energizer_mode] = soundPool.load(context, R.raw.pacman_energizer_mode, 1)
         soundMap[R.raw.pacman_eatghost] = soundPool.load(context, R.raw.pacman_eatghost, 1)
         soundMap[R.raw.pacman_eating_fruit] = soundPool.load(context, R.raw.pacman_eating_fruit, 1)
         soundMap[R.raw.pacman_death] = soundPool.load(context, R.raw.pacman_death, 1)
-        soundMap[R.raw.pacman_eating_pellet] =
-            soundPool.load(context, R.raw.pacman_eating_pellet, 1)
+        soundMap[R.raw.pacman_eating_pellet] = soundPool.load(context, R.raw.pacman_eating_pellet, 1)
         soundMap[R.raw.pacman_extra_life] = soundPool.load(context, R.raw.pacman_extra_life, 1)
         streamMap[R.raw.pacman_intro] = null
         streamMap[R.raw.ghost_siren] = null
@@ -97,8 +95,7 @@ class PacmanSoundService(context: Context) {
     fun recoverSound() {
         isSoundMuted = false
         for (i in soundMap.keys) {
-            val sound = soundMap[i]
-            val soundTone = getSoundTone(sound!!)
+            val soundTone = getSoundTone(i)
             val stream = streamMap[i]
             stream?.let {
                 soundPool.setVolume(it, soundTone, soundTone)
