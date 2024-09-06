@@ -30,7 +30,15 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 ![level_10](https://github.com/user-attachments/assets/8480d9b4-16c8-407c-b491-f00afd8c9945)
 
 ### Here some video of the game
-![video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4)
+
+<html>
+<body>
+  <video width="320" height="240" controls>
+    <source src="https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</body>
+</html>
 
 
 
