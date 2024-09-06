@@ -31,15 +31,6 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 
 ### Here some video of the game
 
-<html>
-<body>
-  <video width="320" height="240" controls>
-    <source src="https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</body>
-</html>
-
 
 
 
