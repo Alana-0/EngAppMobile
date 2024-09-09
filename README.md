@@ -28,7 +28,7 @@ The game features one main activity with six buttons for controlling Pac-Man: up
 
 ### Here some video of the game
 Here is a video of the game in action. You can also download it directly from the resources directory in the project.
-[Link of the video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4)
+[Link of the video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_short.mp4)
 
 ## Tech Stack and Architecture ⚙️
 * **XML** - For building the user interface
