@@ -1,5 +1,6 @@
 package com.myapps.pacman.ghost
 
+import com.myapps.pacman.board.BoardController
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman
@@ -32,7 +33,7 @@ open class Ghost(
             }
             return false
         }
-        if (this.isInHome(homeXRange, homeYRange) && pacman.energizerStatus) {
+        if (this.isInHome(homeXRange, homeYRange) && pacman.pacmanState.value.energizerStatus) {
             if (currentPosition == home) {
                 target = target.copy(positionY = currentPosition.positionY - 1)
             } else if (currentPosition.positionX == home.positionX && currentPosition.positionY == home.positionY - 1) {
@@ -40,7 +41,7 @@ open class Ghost(
             }
             return false
         }
-        if (isInHome(homeXRange, homeYRange) && lifeStatement && !pacman.energizerStatus) {
+        if (isInHome(homeXRange, homeYRange) && lifeStatement && !pacman.pacmanState.value.energizerStatus) {
             canUseDoor = true;
             target = doorTarget
             return false;
@@ -69,8 +70,9 @@ open class Ghost(
     }
 
     fun updateStatus(pacman: Pacman, status: GhostMode) {
-        if (pacman.energizerStatus) {
+        if (pacman.pacmanState.value.energizerStatus) {
             this.mode = GhostMode.SCATTER
+            return
         }
         this.mode = status
     }
@@ -78,7 +80,7 @@ open class Ghost(
 
     private fun isWallCollision(position: Position, currentMap: Matrix<Char>): Boolean {
         val mapElement = currentMap.getElementByPosition(position.positionX, position.positionY)
-        return (mapElement == '|' || (mapElement == '=' && !canUseDoor))
+        return (mapElement == BoardController.WALL_CHAR || (mapElement == BoardController.GHOST_DOOR_CHAR && !canUseDoor))
     }
 
     fun getGhostPossiblePosition(position: Position, direction: Direction): Position =
@@ -189,32 +191,25 @@ open class Ghost(
         }
     }
 
-    fun checkTransfer(position: Position, direction: Direction, currentMap: Matrix<Char>):Boolean =
-        when (direction) {
-            Direction.RIGHT -> {
-                if (position.positionY == currentMap.getColumns()) {
-                    currentPosition = currentPosition.copy(positionY = 0)
-                    true
-                }else false
-            }
 
-            Direction.LEFT -> {
-                if (position.positionY == -1) {
-                    currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
-                    true
-                } else false
-            }
-
-            Direction.UP -> {
-                false
-            }
-
-
-            Direction.DOWN -> {
-                false
-            }
-
-            Direction.NOWHERE -> {false}
+    fun checkTransfer(
+        position: Position,
+        direction: Direction,
+        currentMap: Matrix<Char>
+    ): Boolean = when (direction) {
+        Direction.RIGHT -> {
+            if (position.positionY >= currentMap.getColumns()) {
+                currentPosition = currentPosition.copy(positionY = 0)
+                true
+            } else false
         }
+        Direction.LEFT -> {
+            if (position.positionY < 0) {
+                currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
+                true
+            } else false
+        }
+        else -> false
+    }
 }
 

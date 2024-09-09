@@ -9,7 +9,6 @@ sealed interface PacmanEvents {
     data object LeftDirection:PacmanEvents
     data object UpDirection:PacmanEvents
     data object DownDirection:PacmanEvents
-
     data object MuteSounds:PacmanEvents
     data object RecoverSounds:PacmanEvents
 }

@@ -92,6 +92,20 @@ class Matrix<T>(private var rows:Int, private var columns:Int) {
         return true
     }
 
+
+    fun copy(): Matrix<T> {
+        val newMatrix = Matrix<T>(this.rows, this.columns)
+        for (i in 0 until rows) {
+            for (j in 0 until columns) {
+                val element = getElementByPosition(i, j)
+                if (element != null) {
+                    newMatrix.insertElement(element, i, j)
+                }
+            }
+        }
+        return newMatrix
+    }
+
     fun <R> traverse(matrixDo: MatrixTraverseDo<T, R>, contextVariable:R ?= null){
         for(i in 0..<rows){
             for(j in 0..<columns){

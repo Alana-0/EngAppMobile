@@ -3,8 +3,12 @@ package com.myapps.pacman.ghost
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman
+import com.myapps.pacman.states.GhostData
+import com.myapps.pacman.states.GhostsIdentifiers
 import com.myapps.pacman.timer.ActorsMovementsTimerController
 import com.myapps.pacman.utils.Position
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class Inky(
     currentPosition: Position,
@@ -27,10 +31,22 @@ class Inky(
     direction = direction
 ) {
 
+
+    private val _inkyState = MutableStateFlow(
+        GhostData(
+            ghostPosition = this.currentPosition,
+            ghostDirection = this.direction,
+            ghostLifeStatement = this.lifeStatement,
+            ghostDelay = actorsMovementsTimerController.getInkySpeedDelay().toLong(),
+            GhostsIdentifiers.INKY
+        )
+    )
+    val inkyState: StateFlow<GhostData> get() = _inkyState
+
     private fun calculateTarget(pacman: Pacman, blinkyPosition: Position) {
-        var posX = pacman.currentPosition.positionX
-        var posy = pacman.currentPosition.positionY
-        when (pacman.direction) {
+        var posX = pacman.pacmanState.value.pacmanPosition.positionX
+        var posy = pacman.pacmanState.value.pacmanPosition.positionY
+        when (pacman.pacmanState.value.pacmanDirection) {
             Direction.RIGHT -> {
                 posy += 2
             }
@@ -61,18 +77,14 @@ class Inky(
         currentMap:()-> Matrix<Char>,
         pacman: ()-> Pacman,
         ghostMode: () -> GhostMode,
-        blinkyPosition: () -> Position,
-        onPacmanCollision: (Ghost, Pacman) -> Boolean,
-        onUpdatingMoveAndDirection: () -> Unit
+        blinkyPosition: () -> Position
     ) {
         actorsMovementsTimerController.controlTime(ActorsMovementsTimerController.INKY_ENTITY_TYPE) {
-           return@controlTime updatePosition(
+            updatePosition(
                 currentMap(),
                 pacman(),
                 ghostMode(),
-                blinkyPosition(),
-                onPacmanCollision,
-                onUpdatingMoveAndDirection
+                blinkyPosition()
             )
         }
     }
@@ -81,56 +93,77 @@ class Inky(
         currentMap: Matrix<Char>,
         pacman: Pacman,
         ghostMode: GhostMode,
-        blinkyPosition: Position,
-        onPacmanCollision: (Ghost, Pacman) -> Boolean,
-        onUpdatingMoveAndDirection: () -> Unit
-    ):Boolean {
+        blinkyPosition: Position
+    ){
+        if (checkTransfer(this.currentPosition, this.direction, currentMap)) {
+            updateState()
+            return
+        }
         this.updateStatus(pacman, ghostMode)
         if (isTargetToCalculate(pacman)) {
             calculateTarget(pacman, blinkyPosition)
         }
         this.calculateDirections(currentMap)
         this.move(this.direction)
-        var collisionProduced = onPacmanCollision(this,pacman)
         updateSpeedDelay(pacman)
-        onUpdatingMoveAndDirection()
-        if (!collisionProduced && this.checkTransfer(currentPosition, direction, currentMap)) {
-            collisionProduced = onPacmanCollision(this, pacman)
-            updateSpeedDelay(pacman)
-            onUpdatingMoveAndDirection()
-        }
-        return collisionProduced
+        updateState()
     }
 
     private fun updateSpeedDelay(pacman: Pacman) {
-        when {
-            !this.lifeStatement -> {
-                if (actorsMovementsTimerController.getInkySpeedDelay() != ActorsMovementsTimerController.DEATH_SPEED_DELAY) {
-                    actorsMovementsTimerController.setActorSpeedFactor(
-                        ActorsMovementsTimerController.INKY_ENTITY_TYPE,
-                        ActorsMovementsTimerController.DEATH_SPEED_DELAY
-                    )
-                }
-            }
-
-            pacman.energizerStatus -> {
-                if (actorsMovementsTimerController.getInkySpeedDelay() != ActorsMovementsTimerController.FRIGHTENED_SPEED_DELAY) {
-                    actorsMovementsTimerController.setActorSpeedFactor(
-                        ActorsMovementsTimerController.INKY_ENTITY_TYPE,
-                        ActorsMovementsTimerController.FRIGHTENED_SPEED_DELAY
-                    )
-                }
-            }
-
-            else -> {
-                if (actorsMovementsTimerController.getInkySpeedDelay() != ActorsMovementsTimerController.BASE_GHOST_SPEED_DELAY) {
-                    actorsMovementsTimerController.setActorSpeedFactor(
-                        ActorsMovementsTimerController.INKY_ENTITY_TYPE,
-                        ActorsMovementsTimerController.BASE_GHOST_SPEED_DELAY
-                    )
-                }
-            }
+        val newSpeed = when {
+            !this.lifeStatement -> ActorsMovementsTimerController.DEATH_SPEED_DELAY
+            pacman.pacmanState.value.energizerStatus -> ActorsMovementsTimerController.FRIGHTENED_SPEED_DELAY
+            else -> ActorsMovementsTimerController.BASE_GHOST_SPEED_DELAY
         }
+
+        if(actorsMovementsTimerController.getInkySpeedDelay() != newSpeed){
+            actorsMovementsTimerController.setActorSpeedFactor(
+                ActorsMovementsTimerController.INKY_ENTITY_TYPE,
+                newSpeed
+            )
+        }
+
+        _inkyState.value = _inkyState.value.copy(
+            ghostDelay = actorsMovementsTimerController.getInkySpeedDelay().toLong()
+        )
+    }
+
+    private fun updateState(){
+        _inkyState.value = _inkyState.value.copy(
+            ghostLifeStatement = this.lifeStatement,
+            ghostDirection = this.direction,
+            ghostPosition = this.currentPosition
+        )
+    }
+    fun updateLifeStatement(lifeStatement: Boolean) {
+        this.lifeStatement = lifeStatement
+        _inkyState.value = _inkyState.value.copy(
+            ghostLifeStatement = this.lifeStatement
+        )
+    }
+
+    fun updateDirection(direction: Direction) {
+        this.direction = direction
+        _inkyState.value = _inkyState.value.copy(
+            ghostDirection = this.direction
+        )
+    }
+
+    fun updatePosition(position: Position) {
+        this.currentPosition = position
+        _inkyState.value = _inkyState.value.copy(
+            ghostPosition = this.currentPosition
+        )
+    }
+
+    fun changeSpeedDelay(speedDelay: Long) {
+        actorsMovementsTimerController.setActorSpeedFactor(
+            ActorsMovementsTimerController.INKY_ENTITY_TYPE,
+            speedDelay.toInt()
+        )
+        _inkyState.value = _inkyState.value.copy(
+            ghostDelay = speedDelay
+        )
     }
 
 }

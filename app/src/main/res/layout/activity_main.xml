@@ -7,7 +7,7 @@
     tools:context=".MainActivity"
     android:background="@color/blue">
 
-    <FrameLayout
+    <com.myapps.pacman.ui.PacmanSurfaceView
         android:id="@+id/pacmanView"
         android:layout_width="364dp"
         android:layout_height="481dp"
@@ -15,7 +15,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="50dp"
-        android:elevation="10dp"/>
+        android:elevation="10dp">
+    </com.myapps.pacman.ui.PacmanSurfaceView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"

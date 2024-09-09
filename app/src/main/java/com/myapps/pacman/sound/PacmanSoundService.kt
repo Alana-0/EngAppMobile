@@ -4,15 +4,21 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.util.Log
+import androidx.annotation.RawRes
 import com.myapps.pacman.R
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class PacmanSoundService(context: Context) {
+class PacmanSoundService(
+    context: Context
+):GameSoundService{
 
     companion object {
         private const val MAX_TONE = 0.5f
         private const val MIDDLE_TONE = 0.1f
         private const val LOWER_TONE = 0.05f
         private const val SIREN_TONE = 0.01f
+
     }
 
     private lateinit var audioAttributes: AudioAttributes
@@ -59,7 +65,8 @@ class PacmanSoundService(context: Context) {
         streamMap[R.raw.pacman_extra_life] = null
     }
 
-    fun playSound(
+    override fun playSound(
+        @RawRes
         soundId: Int
     ) {
         val sound = soundMap[soundId]
@@ -82,7 +89,7 @@ class PacmanSoundService(context: Context) {
 
     }
 
-    fun muteSounds() {
+    override fun muteSounds() {
         isSoundMuted = true
         for (i in soundMap.keys) {
             val stream = streamMap[i]
@@ -92,7 +99,7 @@ class PacmanSoundService(context: Context) {
         }
     }
 
-    fun recoverSound() {
+    override fun recoverSound() {
         isSoundMuted = false
         for (i in soundMap.keys) {
             val soundTone = getSoundTone(i)
@@ -103,14 +110,20 @@ class PacmanSoundService(context: Context) {
         }
     }
 
-    fun pauseSound(soundId: Int) {
+    override fun pauseSound(
+        @RawRes
+        soundId: Int
+    ) {
         val stream = streamMap[soundId]
         stream?.let {
             soundPool.pause(it)
         }
     }
 
-    fun stopSound(soundId: Int) {
+    override fun stopSound(
+        @RawRes
+        soundId: Int
+    ) {
         val sound = streamMap[soundId]
         sound?.let {
             soundPool.stop(it)

@@ -1,87 +1,82 @@
 package com.myapps.pacman.pacman
 
+
+import com.myapps.pacman.board.BoardController
+import com.myapps.pacman.states.PacmanData
 import com.myapps.pacman.timer.ActorsMovementsTimerController
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.Position
-import com.myapps.pacman.utils.TypeOfCollision
 import com.myapps.pacman.utils.matrix.Matrix
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class Pacman(
-    var direction: Direction = Direction.RIGHT,
-    var lifeStatement: Boolean = true,
-    var energizerStatus: Boolean = false,
-    var currentPosition: Position,
+    initialPosition: Position,
+    initialDirection: Direction = Direction.RIGHT,
+    initialEnergizerStatus: Boolean = false,
     private val actorsMovementsTimerController: ActorsMovementsTimerController
 ) {
 
+    private var direction: Direction = initialDirection
+    private var lifeStatement: Boolean = true
+    private var energizerStatus: Boolean = initialEnergizerStatus
+    private var currentPosition: Position = initialPosition
 
-   suspend fun startMoving(
-       movements: MutableList<Direction>,
-       currentMap: () -> Matrix<Char>,
-       onFoodCollision: (Position, TypeOfCollision) -> Unit,
-       onGhostCollision: (Position) -> Boolean,
-       onUpdatingMoveAndDirection: () -> Unit
-   ){
-       actorsMovementsTimerController.controlTime(ActorsMovementsTimerController.PACMAN_ENTITY_TYPE){
-           return@controlTime updatePosition(
-               movements,
-               currentMap(),
-               onFoodCollision,
-               onGhostCollision,
-               onUpdatingMoveAndDirection
-           )
-       }
-   }
-   private fun updatePosition(
+    private val _pacmanState = MutableStateFlow(
+        PacmanData(
+            currentPosition,
+            direction,
+            energizerStatus,
+            actorsMovementsTimerController.getPacmanSpeedDelay().toLong(),
+            lifeStatement
+        )
+    )
+    val pacmanState: StateFlow<PacmanData> get() = _pacmanState
+
+    suspend fun startMoving(
         movements: MutableList<Direction>,
-        currentMap: Matrix<Char>,
-        onFoodCollision: (Position, TypeOfCollision) -> Unit,
-        onGhostCollision: (Position) -> Boolean,
-        onUpdatingMoveAndDirection: () -> Unit
-   ):Boolean {
-        var position = getPacmanPossiblePosition(currentPosition, movements[0])
-
-        if (!isWallCollision(position, currentMap)) {
-            this.move(movements[0])
-            this.direction = movements[0]
-            onUpdatingMoveAndDirection()
-            onFoodCollision(
-                this.currentPosition,
-                checkFoodCollisions(this.currentPosition, currentMap)
+        currentMap: () -> Matrix<Char>
+    ){
+        actorsMovementsTimerController.controlTime(ActorsMovementsTimerController.PACMAN_ENTITY_TYPE){
+            updatePosition(
+                movements,
+                currentMap()
             )
-            if(onGhostCollision(this.currentPosition)) return true
-            if (this.checkTransfer(this.currentPosition, this.direction, currentMap)) {
-                onFoodCollision(
-                    this.currentPosition,
-                    checkFoodCollisions(this.currentPosition, currentMap)
-                )
-                if(onGhostCollision(this.currentPosition)) return true
-            }
+        }
+    }
+
+    private fun updatePosition(
+        movements: MutableList<Direction>,
+        currentMap: Matrix<Char>
+    ) {
+        val primaryDirection = movements.getOrNull(0) ?: return
+        val secondaryDirection = movements.getOrNull(1)
+
+
+        val newPosition = getPacmanPossiblePosition(currentPosition, primaryDirection)
+
+        if (checkTransfer(newPosition, primaryDirection, currentMap)) {
+            updatePacmanState(currentPosition, direction)
+            return
         }
 
-
-        if (movements.size > 1 && movements[0] != movements[1]) {
-            position = getPacmanPossiblePosition(currentPosition, movements[1])
-            if (!isWallCollision(position, currentMap)) {
-                this.move(movements[1])
-                this.direction = movements[1]
-                onUpdatingMoveAndDirection()
-                if(onGhostCollision(this.currentPosition)) return true
-                onFoodCollision(
-                    this.currentPosition,
-                    checkFoodCollisions(this.currentPosition, currentMap)
-                )
-                if (this.checkTransfer(this.currentPosition, this.direction, currentMap)) {
-                    onFoodCollision(
-                        this.currentPosition,
-                        checkFoodCollisions(this.currentPosition, currentMap)
-                    )
-                    if(onGhostCollision(this.currentPosition)) return true
-                }
+        if (secondaryDirection != null && primaryDirection != secondaryDirection) {
+           val newSecondPosition = getPacmanPossiblePosition(currentPosition, secondaryDirection)
+            if (!isWallCollision(newSecondPosition, currentMap)) {
+                move(secondaryDirection)
+                this.direction = secondaryDirection
+                updatePacmanState(currentPosition, secondaryDirection)
                 movements.removeAt(0)
+                return
             }
         }
-       return false
+
+        if (!isWallCollision(newPosition, currentMap)) {
+            move(primaryDirection)
+            this.direction = primaryDirection
+            updatePacmanState(currentPosition, primaryDirection)
+            return
+        }
     }
 
     private fun getPacmanPossiblePosition(position: Position, direction: Direction): Position =
@@ -96,7 +91,7 @@ class Pacman(
     private fun isWallCollision(position: Position, currentMap: Matrix<Char>): Boolean {
         val elementPosition =
             currentMap.getElementByPosition(position.positionX, position.positionY)
-        return elementPosition == '|' || elementPosition == '='
+        return elementPosition == BoardController.WALL_CHAR || elementPosition == BoardController.GHOST_DOOR_CHAR
     }
 
     private fun checkTransfer(
@@ -105,30 +100,20 @@ class Pacman(
         currentMap: Matrix<Char>
     ): Boolean = when (direction) {
         Direction.RIGHT -> {
-            if (position.positionY == currentMap.getColumns()) {
+            if (position.positionY >= currentMap.getColumns()) {
+                // Transferir al borde izquierdo
                 currentPosition = currentPosition.copy(positionY = 0)
                 true
             } else false
         }
-
         Direction.LEFT -> {
-            if (position.positionY == -1) {
+            if (position.positionY < 0) {
+                // Transferir al borde derecho
                 currentPosition = currentPosition.copy(positionY = currentMap.getColumns() - 1)
                 true
             } else false
         }
-
-        Direction.UP -> {
-            false
-        }
-
-        Direction.DOWN -> {
-            false
-        }
-
-        Direction.NOWHERE -> {
-            false
-        }
+        else -> false
     }
 
     private fun move(direction: Direction) {
@@ -149,20 +134,46 @@ class Pacman(
         }
     }
 
-
-    private fun checkFoodCollisions(
-        pacmanPosition: Position,
-        gameMap: Matrix<Char>
-    ): TypeOfCollision {
-        val element = gameMap.getElementByPosition(
-            pacmanPosition.positionX,
-            pacmanPosition.positionY
-        )
-        return when (element) {
-            '.' -> TypeOfCollision.PELLET
-            'o' -> TypeOfCollision.ENERGIZER
-            'b' -> TypeOfCollision.BELL
-            else -> TypeOfCollision.NONE
+    private fun updatePacmanState(newPosition: Position, newDirection: Direction) {
+        if (_pacmanState.value.pacmanPosition != newPosition || _pacmanState.value.pacmanDirection != newDirection) {
+            _pacmanState.value = _pacmanState.value.copy(
+                pacmanPosition = newPosition,
+                pacmanDirection = newDirection
+            )
         }
+    }
+    fun updateDirection(direction: Direction){
+        this.direction = direction
+        _pacmanState.value = _pacmanState.value.copy(
+            pacmanDirection = this.direction
+        )
+    }
+
+    fun updatePosition(position: Position){
+        this.currentPosition = position
+        _pacmanState.value = _pacmanState.value.copy(
+            pacmanPosition = currentPosition
+        )
+    }
+
+    fun updateLifeStatement(lifeStatement:Boolean){
+        this.lifeStatement = lifeStatement
+        _pacmanState.value = _pacmanState.value.copy(
+            lifeStatement = this.lifeStatement
+        )
+    }
+
+    fun updateEnergizerStatus(energizerStatus: Boolean){
+        this.energizerStatus = energizerStatus
+        _pacmanState.value = _pacmanState.value.copy(
+            energizerStatus = this.energizerStatus
+        )
+    }
+
+    fun updateSpeedDelay(speedDelay: Int){
+        actorsMovementsTimerController.setActorSpeedFactor(ActorsMovementsTimerController.PACMAN_ENTITY_TYPE,speedDelay)
+        _pacmanState.value = _pacmanState.value.copy(
+            speedDelay = actorsMovementsTimerController.getPacmanSpeedDelay().toLong()
+        )
     }
 }

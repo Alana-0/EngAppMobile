@@ -65,13 +65,10 @@ class ActorsMovementsTimerController {
     fun getPacmanSpeedDelay(): Int = pacmanSpeedDelay
 
 
-    suspend fun controlTime(entityType: String, action: () -> Boolean) {
+    suspend fun controlTime(entityType: String, action: () -> Unit) {
         while (true) {
             if (!movementsPause.isPaused) {
-                val needToPause = action()
-                if (needToPause) {
-                    pause()
-                }
+                action()
             }
 
             if(movementsPause.isPaused){

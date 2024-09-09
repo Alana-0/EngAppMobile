@@ -1,53 +1,49 @@
 package com.myapps.pacman.timer
 
-class Timer() {
-    private var startTicks = 0
-    private var pausedTicks = 0
+import com.myapps.pacman.modules.qualifiers.DispatcherDefault
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
+
+class Timer @Inject constructor(
+    @DispatcherDefault
+    private val coroutineDispatcher: CoroutineDispatcher,
+    private val intervalMillis: Long = 1000L
+) : TimerInterface {
+
+    private var currentTicks = AtomicInteger(0)
+    private var job: Job? = null
     private var isPaused = false
-    private var isStarted = false
 
-    fun start() {
-        isStarted = true
-        isPaused = false
-        startTicks = TimeFlow.getCurrentTicks()
-        pausedTicks = 0
-    }
-
-    fun reset() {
-        startTicks = 0
-        pausedTicks = 0
-        isPaused = false
-        isStarted = false
-    }
-
-    fun restart() {
-        this.reset()
-        this.start()
-    }
-
-    fun pause() {
-        if (isStarted && !isPaused) {
-            isPaused = true
-            pausedTicks = TimeFlow.getCurrentTicks() - startTicks
-            startTicks = 0
+    override fun init() {
+        job?.cancel()
+        job = CoroutineScope(coroutineDispatcher).launch {
+            while (isActive) {
+                if (!isPaused) {
+                    currentTicks.incrementAndGet()
+                }
+                delay(intervalMillis)
+            }
         }
     }
 
-    fun unpause() {
-        if (isStarted && isPaused) {
-            isPaused = false
-            startTicks = TimeFlow.getCurrentTicks() - pausedTicks
-            pausedTicks = 0
-        }
+    override fun pauseUnpauseTime() {
+        isPaused = !isPaused
     }
 
-    fun getTicks(): Int =
-        if (isStarted) {
-            if (isPaused) {
-                pausedTicks
-            } else TimeFlow.getCurrentTicks() - startTicks
-        } else 0
+    override fun resetCounter() {
+        currentTicks.set(0)
+    }
 
-    fun isStarted(): Boolean = isStarted
-    fun isPaused(): Boolean = isPaused
+    override fun stop() {
+        job?.cancel()
+        currentTicks.set(0)
+    }
+
+    override fun getCurrentTicks(): Int = currentTicks.get()
 }

@@ -4,5 +4,6 @@ enum class TypeOfCollision {
     PELLET,
     ENERGIZER,
     BELL,
+    WALL,
     NONE
 }
