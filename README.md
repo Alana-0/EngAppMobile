@@ -1,20 +1,17 @@
 # Pacman Game
 
-_This is a implementation of the clasical Pacman arcade game for android. Although it is a personal version,
-all the main mechanics are the same than the original version._
+_This project is an Android implementation of the classic Pac-Man arcade game. While this version includes some personal touches,
+the core mechanics remain faithful to the original game._
 
 ## About the game
-The game contains ten different levels, all of them with its own map. All the maps are full with pellets and 
-four energizers (from level one to eight) wichs ones pacman should eat.
-Pacman has three lives, if it loses all of them, the game is lost. 
-In five of the ten levels, the red ghost will increase his speed and the only way for pacman to match that speed is 
-eating the five bells that will appear in some levels.
+The game contains ten different levels, all of them with its own map.The maps are filled with pellets and four energizers
+(from levels one to eight), which Pac-Man must eat to progress. Pacman has three lives, if it loses all of them, the game is lost. 
+In five of the ten levels, the red ghost will increase its speed, and the only way for Pac-Man to match that speed is by
+eating the five bells that will appear in specific levels.
 
 ## About the implementation of the game 📋
-When i propouse myself to develop this game for android, i tried to make it simple avoiding some libraries like Open GL or SDL.
-At the end i decided to use some of the native tools that kotlin provides. In conclusion the game was developed using coroutines
-and flows in order to control the state of the game and the Canvas class for the ui.
-There is one activity wich contains six buttons: up,right,left,down,start and stop.
+When I set out to develop this game for Android, I aimed to keep it simple, avoiding external libraries like OpenGL or SDL. Instead, I chose to use Kotlin's native tools. The game was developed using coroutines and flows to manage game state, and the Canvas class for rendering the UI.
+The game features one main activity with six buttons for controlling Pac-Man: up, right, left, down, start, and stop.
 
 
 #### Here some screenshots of the app (the ten levels)
@@ -29,17 +26,16 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 ![level_9](https://github.com/user-attachments/assets/5a8a236a-91a0-4bcb-9693-a3ef056a4f6f)
 ![level_10](https://github.com/user-attachments/assets/8480d9b4-16c8-407c-b491-f00afd8c9945)
 
-### Here some video of the game (or download directly of resources directory in the project)
-
+### Here some video of the game
+Here is a video of the game in action. You can also download it directly from the resources directory in the project.
 [Link of the video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4)
 
-
-## Tech Stack Used And Architectural pattern ⚙️
-* XML - For the views
-* MVVM(Model-View-ViewModel) - Main Architecture pattern
-* Kotlin - The main language
-* Coroutines and Flows
-* JSON files for the data of the levels
+## Tech Stack and Architecture ⚙️
+* **XML** - For building the user interface
+* **MVVM (Model-View-ViewModel)** - Architectural pattern to manage UI-related data in a lifecycle-conscious way
+* **Kotlin** - Programming language used for all logic and structure
+* **Coroutines and Flows** - For asynchronous operations and game state management
+* **JSON** - For storing and managing level data
 
 ## Authors ✒️
 
