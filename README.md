@@ -31,7 +31,7 @@ There is one activity wich contains six buttons: up,right,left,down,start and st
 
 ### Here some video of the game
 
-![video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4)
+[video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_test.mp4)
 
 
 ## Tech Stack Used And Architectural pattern ⚙️
