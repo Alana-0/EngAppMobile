@@ -41,10 +41,6 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.gameIsStarted.collect{
                 if(it){
-                    binding.pacmanView.setActiveGameView(false)
-                    binding.pacmanView.stopAllCurrentJobs()
-                }
-                else{
                     binding.pacmanView.setActiveGameView(true)
                     binding.pacmanView.setGameBoardData(viewModel.mapBoardData)
                     binding.pacmanView.setPacmanData(viewModel.pacmanData)
@@ -53,27 +49,31 @@ class MainActivity : AppCompatActivity() {
                     binding.pacmanView.setPinkyData(viewModel.pinkyData)
                     binding.pacmanView.setClydeData(viewModel.clydeData)
                 }
+                else{
+                    binding.pacmanView.setActiveGameView(false)
+                    binding.pacmanView.stopAllCurrentJobs()
+                }
             }
         }
         lifecycleScope.launch {
             viewModel.gameIsMute.collect{
                 if(it){
-                    binding.pacmanView.changeSoundGameStatus(false)
+                    binding.pacmanView.changeSoundGameStatus(true)
                 }
                 else{
-                    binding.pacmanView.changeSoundGameStatus(true)
+                    binding.pacmanView.changeSoundGameStatus(false)
                 }
             }
         }
         lifecycleScope.launch{
             viewModel.gameIsPaused.collect{
                 if(it){
-                    binding.pacmanView.changePauseGameStatus(false)
-                    binding.pacmanView.resumeGameDraw()
-                }
-                else{
                     binding.pacmanView.changePauseGameStatus(true)
                     binding.pacmanView.pauseGameDraw()
+                }
+                else{
+                    binding.pacmanView.changePauseGameStatus(false)
+                    binding.pacmanView.resumeGameDraw()
                 }
             }
         }
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             binding.startResetButton.postDelayed({
-                binding.startResetButton.isEnabled = true // Reactiva el botón después de 500ms
+                binding.startResetButton.isEnabled = true
             }, 1000)
         }
     }
