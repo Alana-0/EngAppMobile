@@ -12,6 +12,7 @@ import com.myapps.pacman.game.PacmanGame
 import com.myapps.pacman.utils.Direction
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+
 import javax.inject.Inject
 
 @HiltViewModel
