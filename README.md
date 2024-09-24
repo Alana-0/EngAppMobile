@@ -30,6 +30,7 @@ The game features one main activity with six buttons for controlling Pac-Man: up
 Here is a video of the game in action. You can also download it directly from the resources directory in the project.
 [Link of the video](https://github.com/MauroSerantes/Pacman_Android/blob/main/resources/game_short.mp4)
 
+
 ## Tech Stack and Architecture ⚙️
 * **XML** - For building the user interface
 * **MVVM (Model-View-ViewModel)** - Architectural pattern to manage UI-related data in a lifecycle-conscious way
