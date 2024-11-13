@@ -7,7 +7,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class ActorsMovementsTimerController {
-
     companion object {
         const val FRIGHTENED_SPEED_DELAY = 500
         const val DEATH_SPEED_DELAY = 100

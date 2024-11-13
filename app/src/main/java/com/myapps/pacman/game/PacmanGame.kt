@@ -256,11 +256,18 @@ class PacmanGame @Inject constructor(
     fun stopGame() {
         isGameStarted = false
         gameJobIsPaused = false
-        actorsMovementsTimerController.resume()
+
+
+        gameJob?.cancel()
+        pacmanMovementJob?.cancel()
+
+
         collisionHandler.cancelCollisionObservation()
         centralTimerController.stopAllTimersController()
-        coroutineSupervisor.cancelAll()
+
+        if (boardController.boardState.value.gameStatus ==  GameStatus.ONGOING) coroutineSupervisor.cancelAll()
         coroutineSupervisor.onDestroy()
+
         gameJob = null
         pacmanMovementJob = null
         resetGame()
