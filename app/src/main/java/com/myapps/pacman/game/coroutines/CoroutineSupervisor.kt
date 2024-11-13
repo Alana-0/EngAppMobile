@@ -10,8 +10,8 @@ import kotlin.coroutines.CoroutineContext
 
 class CoroutineSupervisor(private val coroutineDispatcher: CoroutineDispatcher):CoroutineScope {
     private var job = SupervisorJob()
-    override val coroutineContext: CoroutineContext
-        get() = coroutineDispatcher + job
+    override var coroutineContext: CoroutineContext =  coroutineDispatcher + job
+
     fun cancelAll() {
         job.cancelChildren()
     }
@@ -22,6 +22,7 @@ class CoroutineSupervisor(private val coroutineDispatcher: CoroutineDispatcher):
     fun restartJob() {
         if (job.isCancelled) {
             job = SupervisorJob()
+            coroutineContext = coroutineDispatcher + job
         }
     }
 }
