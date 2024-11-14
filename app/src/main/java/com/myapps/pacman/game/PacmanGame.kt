@@ -24,9 +24,7 @@ import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.Position
 import com.myapps.pacman.utils.transformLevelsDataIntoListsOfDots
 import com.myapps.pacman.utils.transformLevelsDataIntoMaps
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
@@ -203,10 +201,6 @@ class PacmanGame @Inject constructor(
                 centralTimerController.initTimerFunction()
                 startGame(movements)
                 while (isActive && boardController.boardState.value.gameStatus == GameStatus.ONGOING) {
-
-                    if (boardController.boardState.value.gameStatus == GameStatus.WON || boardController.boardState.value.gameStatus ==  GameStatus.LOSE) {
-                        this.cancel()
-                    }
                     val startMillis = System.currentTimeMillis()
                     if (!gameJobIsPaused) {
                         checkPacmanDeath(movements)
@@ -258,17 +252,11 @@ class PacmanGame @Inject constructor(
     fun stopGame() {
         isGameStarted = false
         gameJobIsPaused = false
-
-        gameJob?.cancel()
-        pacmanMovementJob?.cancel()
-
-
+        actorsMovementsTimerController.resume()
         collisionHandler.cancelCollisionObservation()
         centralTimerController.stopAllTimersController()
-
-        if (boardController.boardState.value.gameStatus ==  GameStatus.ONGOING) coroutineSupervisor.cancelAll()
+        coroutineSupervisor.cancelAll()
         coroutineSupervisor.onDestroy()
-
         gameJob = null
         pacmanMovementJob = null
         resetGame()
@@ -285,14 +273,14 @@ class PacmanGame @Inject constructor(
         resetPositions(boardController.boardState.value.currentLevel)
     }
 
-
     private fun cancelActorMovements(){
         blinkyMovementJob?.cancel()
-        pacmanMovementJob?.cancel()
         inkyMovementJob?.cancel()
         pinkyMovementJob?.cancel()
         clydeMovementJob?.cancel()
+        pacmanMovementJob?.cancel()
     }
+
     private fun clearMovements(movements: MutableList<Direction>) {
         movements.clear()
         movements.add(Direction.RIGHT)
