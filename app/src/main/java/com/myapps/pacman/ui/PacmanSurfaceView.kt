@@ -200,7 +200,7 @@ class PacmanSurfaceView(
                     }
                 } else {
                     pacmanPosition = pairPosition
-                    invalidate()
+                   // invalidate()
                 }
             }
         }

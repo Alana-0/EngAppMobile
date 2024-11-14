@@ -67,19 +67,19 @@ class PacmanGame @Inject constructor(
 
 
     //game Actors
-     private var pacman: Pacman
-     private var blinky: Blinky
-     private var inky: Inky
-     private var pinky: Pinky
-     private var clyde: Clyde
-     private var boardController: BoardController
+    private var pacman: Pacman
+    private var blinky: Blinky
+    private var inky: Inky
+    private var pinky: Pinky
+    private var clyde: Clyde
+    private var boardController: BoardController
 
-    val pacmanState:StateFlow<PacmanData> get() = pacman.pacmanState
-    val blinkyState:StateFlow<GhostData> get() = blinky.blinkyState
-    val inkyState:StateFlow<GhostData> get() = inky.inkyState
-    val pinkyState:StateFlow<GhostData> get() = pinky.pinkyState
-    val clydeState:StateFlow<GhostData> get() = clyde.clydeState
-    val boardState:StateFlow<BoardData> get() = boardController.boardState
+    val pacmanState: StateFlow<PacmanData> get() = pacman.pacmanState
+    val blinkyState: StateFlow<GhostData> get() = blinky.blinkyState
+    val inkyState: StateFlow<GhostData> get() = inky.inkyState
+    val pinkyState: StateFlow<GhostData> get() = pinky.pinkyState
+    val clydeState: StateFlow<GhostData> get() = clyde.clydeState
+    val boardState: StateFlow<BoardData> get() = boardController.boardState
 
     init {
         levelsData = mapProvider.getMaps()
@@ -88,23 +88,27 @@ class PacmanGame @Inject constructor(
             dots = transformLevelsDataIntoListsOfDots(levelsData)
         )
         pacman = Pacman(
-            initialPosition = levelsData[boardController.boardState.value.currentLevel]?.pacmanDefaultPosition ?: Position(
-                -1,
-                -1
-            ),
-            actorsMovementsTimerController = actorsMovementsTimerController
+            initialPosition = levelsData[boardController.boardState.value.currentLevel]?.pacmanDefaultPosition
+                ?: Position(
+                    -1, -1
+                ), actorsMovementsTimerController = actorsMovementsTimerController
         )
         blinky = Blinky(
-            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.blinkyDefaultPosition ?: Position(
-                -1,
-                -1
-            ),
+            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.blinkyDefaultPosition
+                ?: Position(
+                    -1, -1
+                ),
             target = Position(0, 0),
-            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.blinkyScatterPosition ?: Position(-1, -1),
-            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget ?: Position(-1, -1),
-            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition ?: Position(-1, -1),
-            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange ?: IntRange(-1, 0),
-            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange ?: IntRange(-1, 0),
+            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.blinkyScatterPosition
+                ?: Position(-1, -1),
+            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget
+                ?: Position(-1, -1),
+            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition
+                ?: Position(-1, -1),
+            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange
+                ?: IntRange(-1, 0),
+            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange
+                ?: IntRange(-1, 0),
             direction = Direction.NOWHERE,
             levelsData[boardController.boardState.value.currentLevel]?.blinkySpeedDelay
                 ?: ActorsMovementsTimerController.BASE_GHOST_SPEED_DELAY,
@@ -112,48 +116,66 @@ class PacmanGame @Inject constructor(
         )
 
         inky = Inky(
-            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.inkyDefaultPosition ?: Position(-1, -1),
+            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.inkyDefaultPosition
+                ?: Position(-1, -1),
             target = Position(0, 0),
-            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.inkyScatterPosition ?: Position(-1, -1),
-            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget ?: Position(-1, -1),
-            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition ?: Position(-1, -1),
-            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange ?: IntRange(-1, 0),
-            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange ?: IntRange(-1, 0),
+            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.inkyScatterPosition
+                ?: Position(-1, -1),
+            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget
+                ?: Position(-1, -1),
+            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition
+                ?: Position(-1, -1),
+            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange
+                ?: IntRange(-1, 0),
+            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange
+                ?: IntRange(-1, 0),
             direction = Direction.NOWHERE,
             actorsMovementsTimerController
         )
 
         pinky = Pinky(
-            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.pinkyDefaultPosition ?: Position(-1, -1),
+            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.pinkyDefaultPosition
+                ?: Position(-1, -1),
             target = Position(0, 0),
-            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.pinkyScatterPosition ?: Position(-1, -1),
-            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget ?: Position(-1, -1),
-            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition ?: Position(-1, -1),
-            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange ?: IntRange(-1, 0),
-            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange ?: IntRange(-1, 0),
+            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.pinkyScatterPosition
+                ?: Position(-1, -1),
+            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget
+                ?: Position(-1, -1),
+            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition
+                ?: Position(-1, -1),
+            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange
+                ?: IntRange(-1, 0),
+            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange
+                ?: IntRange(-1, 0),
             direction = Direction.NOWHERE,
             actorsMovementsTimerController
         )
 
         clyde = Clyde(
-            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.clydeDefaultPosition ?: Position(-1, -1),
+            currentPosition = levelsData[boardController.boardState.value.currentLevel]?.clydeDefaultPosition
+                ?: Position(-1, -1),
             target = Position(0, 0),
-            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.clydeScatterPosition ?: Position(-1, -1),
-            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget ?: Position(-1, -1),
-            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition ?: Position(-1, -1),
-            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange ?: IntRange(-1, 0),
-            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange ?: IntRange(-1, 0),
+            scatterTarget = levelsData[boardController.boardState.value.currentLevel]?.clydeScatterPosition
+                ?: Position(-1, -1),
+            doorTarget = levelsData[boardController.boardState.value.currentLevel]?.doorTarget
+                ?: Position(-1, -1),
+            home = levelsData[boardController.boardState.value.currentLevel]?.homeTargetPosition
+                ?: Position(-1, -1),
+            homeXRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeXRange
+                ?: IntRange(-1, 0),
+            homeYRange = levelsData[boardController.boardState.value.currentLevel]?.ghostHomeYRange
+                ?: IntRange(-1, 0),
             direction = Direction.NOWHERE,
             actorsMovementsTimerController
         )
 
 
         pacman.updateSpeedDelay(pacmanSpeedDelay)
-        collisionHandler.handleBellCollision = {handleBellCollision(it)}
-        collisionHandler.handlePelletCollision = {handlePelletCollision(it)}
-        collisionHandler.handleEnergizerCollision = {handleEnergizerCollision(it)}
-        collisionHandler.handlePacmanDeath = {handlePacmanHit()}
-        collisionHandler.handleGhostEaten = {handleGhostEaten(it)}
+        collisionHandler.handleBellCollision = { handleBellCollision(it) }
+        collisionHandler.handlePelletCollision = { handlePelletCollision(it) }
+        collisionHandler.handleEnergizerCollision = { handleEnergizerCollision(it) }
+        collisionHandler.handlePacmanDeath = { handlePacmanHit() }
+        collisionHandler.handleGhostEaten = { handleGhostEaten(it) }
 
         centralTimerController.addNewTimerController(CentralTimerController.GHOST_TIMER)
         centralTimerController.addNewTimerController(CentralTimerController.ENERGIZER_TIMER)
@@ -200,7 +222,10 @@ class PacmanGame @Inject constructor(
             try {
                 centralTimerController.initTimerFunction()
                 startGame(movements)
-                while (isActive && boardController.boardState.value.gameStatus == GameStatus.ONGOING) {
+                while (isActive) {
+                    if (boardController.boardState.value.gameStatus != GameStatus.ONGOING) {
+                        break
+                    }
                     val startMillis = System.currentTimeMillis()
                     if (!gameJobIsPaused) {
                         checkPacmanDeath(movements)
@@ -218,11 +243,13 @@ class PacmanGame @Inject constructor(
                         awaitGamePauseResume()
                     }
                 }
-            } finally {
+            }
+            finally {
                 centralTimerController.stopAllTimersController()
                 centralTimerController.stopTimerFunction()
                 collisionHandler.cancelCollisionObservation()
-                cancelActorMovements()
+                coroutineSupervisor.cancelAll()
+                coroutineSupervisor.onDestroy()
             }
         }
     }
@@ -236,14 +263,9 @@ class PacmanGame @Inject constructor(
             isGameStarted = true
             startActorsMovements(movements)
             collisionHandler.startObservingCollisions(
-                pacman.pacmanState,
-                listOf(
-                    blinky.blinkyState,
-                    pinky.pinkyState,
-                    inky.inkyState,
-                    clyde.clydeState
-                ),
-                boardController.boardState
+                pacman.pacmanState, listOf(
+                    blinky.blinkyState, pinky.pinkyState, inky.inkyState, clyde.clydeState
+                ), boardController.boardState
             )
             sirenSoundStart()
         }
@@ -253,10 +275,13 @@ class PacmanGame @Inject constructor(
         isGameStarted = false
         gameJobIsPaused = false
         actorsMovementsTimerController.resume()
-        collisionHandler.cancelCollisionObservation()
-        centralTimerController.stopAllTimersController()
-        coroutineSupervisor.cancelAll()
-        coroutineSupervisor.onDestroy()
+        if (boardState.value.gameStatus == GameStatus.ONGOING) {
+            collisionHandler.cancelCollisionObservation()
+            centralTimerController.stopAllTimersController()
+            centralTimerController.stopTimerFunction()
+            coroutineSupervisor.cancelAll()
+            coroutineSupervisor.onDestroy()
+        }
         gameJob = null
         pacmanMovementJob = null
         resetGame()
@@ -273,7 +298,7 @@ class PacmanGame @Inject constructor(
         resetPositions(boardController.boardState.value.currentLevel)
     }
 
-    private fun cancelActorMovements(){
+    private fun cancelActorMovements() {
         blinkyMovementJob?.cancel()
         inkyMovementJob?.cancel()
         pinkyMovementJob?.cancel()
@@ -326,7 +351,6 @@ class PacmanGame @Inject constructor(
     }
 
 
-
     private fun startActorsMovements(movements: MutableList<Direction>) {
         pacmanMovementJob = coroutineSupervisor.launch {
             pacman.startMoving(movements) { boardController.boardState.value.gameBoardData }
@@ -350,11 +374,9 @@ class PacmanGame @Inject constructor(
         }
 
         pinkyMovementJob = coroutineSupervisor.launch {
-            pinky.startMoving(
-                currentMap = { boardController.boardState.value.gameBoardData },
+            pinky.startMoving(currentMap = { boardController.boardState.value.gameBoardData },
                 { pacman },
-                ghostMode = { ghostMode }
-            )
+                ghostMode = { ghostMode })
         }
 
         clydeMovementJob = coroutineSupervisor.launch {
@@ -380,13 +402,14 @@ class PacmanGame @Inject constructor(
             }
         }
     }
+
     private fun handlePelletCollision(position: Position) {
-        boardController.entityGetsEat(position,GameConstants.PELLET_POINTS)
+        boardController.entityGetsEat(position, GameConstants.PELLET_POINTS)
         gameSoundService.playSound(R.raw.pacman_eating_pellet)
     }
 
     private fun handleEnergizerCollision(position: Position) {
-        boardController.entityGetsEat(position,GameConstants.ENERGIZER_POINTS)
+        boardController.entityGetsEat(position, GameConstants.ENERGIZER_POINTS)
         pacman.updateEnergizerStatus(true)
         centralTimerController.startTimerController(CentralTimerController.ENERGIZER_TIMER)
         centralTimerController.pauseTimerController(CentralTimerController.GHOST_TIMER)
@@ -395,11 +418,10 @@ class PacmanGame @Inject constructor(
     }
 
     private fun handleBellCollision(position: Position) {
-        boardController.entityGetsEat(position,GameConstants.BELL_POINTS)
+        boardController.entityGetsEat(position, GameConstants.BELL_POINTS)
         pacmanSpeedDelay -= GameConstants.BELL_REDUCTION_TIME
         actorsMovementsTimerController.setActorSpeedFactor(
-            ActorsMovementsTimerController.PACMAN_ENTITY_TYPE,
-            pacmanSpeedDelay
+            ActorsMovementsTimerController.PACMAN_ENTITY_TYPE, pacmanSpeedDelay
         )
         pacman.updateSpeedDelay(actorsMovementsTimerController.getPacmanSpeedDelay())
         gameSoundService.playSound(R.raw.pacman_eating_fruit)
@@ -407,7 +429,7 @@ class PacmanGame @Inject constructor(
 
 
     private fun handleGhostEaten(ghost: GhostData) {
-        when(ghost.identifier){
+        when (ghost.identifier) {
             GhostsIdentifiers.BLINKY -> blinky.updateLifeStatement(false)
             GhostsIdentifiers.INKY -> inky.updateLifeStatement(false)
             GhostsIdentifiers.PINKY -> pinky.updateLifeStatement(false)
@@ -496,8 +518,8 @@ class PacmanGame @Inject constructor(
 
     private fun handleBellTimer() {
         boardController.updateCurrentMap(
-            levelsData[boardController.boardState.value.currentLevel]?.pacmanDefaultPosition?:Position(-1,-1),
-            BoardController.EMPTY_SPACE
+            levelsData[boardController.boardState.value.currentLevel]?.pacmanDefaultPosition
+                ?: Position(-1, -1), BoardController.EMPTY_SPACE
         )
         centralTimerController.stopTimerController(CentralTimerController.BELL_TIMER)
     }
@@ -514,21 +536,19 @@ class PacmanGame @Inject constructor(
         }
     }
 
-    private fun calculateEatGhostScorer(): Int =
-        when (counterEatingGhost) {
-            1 -> 200
-            2 -> 400
-            3 -> 800
-            4 -> 1600
-            else -> 0
-        }
+    private fun calculateEatGhostScorer(): Int = when (counterEatingGhost) {
+        1 -> 200
+        2 -> 400
+        3 -> 800
+        4 -> 1600
+        else -> 0
+    }
 
     private fun configureGhostAndPacmanLevelDefaults(currentLevel: Int) {
         ghostMode = GhostMode.SCATTER
         pacmanSpeedDelay = pacmanSpeedDelay()
         actorsMovementsTimerController.setActorSpeedFactor(
-            ActorsMovementsTimerController.PACMAN_ENTITY_TYPE,
-            pacmanSpeedDelay
+            ActorsMovementsTimerController.PACMAN_ENTITY_TYPE, pacmanSpeedDelay
         )
         blinky.scatterTarget = levelsData[currentLevel]?.blinkyScatterPosition ?: Position(-1, -1)
         inky.scatterTarget = levelsData[currentLevel]?.inkyScatterPosition ?: Position(-1, -1)
@@ -573,19 +593,15 @@ class PacmanGame @Inject constructor(
         if (boardController.boardState.value.remainFood > 140 || isBellAppear) return
 
         val bellPosition = levelData.pacmanDefaultPosition
-        if (pacman.pacmanState.value.pacmanPosition == bellPosition ||
-            blinky.blinkyState.value.ghostPosition == bellPosition ||
-            pinky.pinkyState.value.ghostPosition == bellPosition ||
-            inky.inkyState.value.ghostPosition == bellPosition ||
-            clyde.clydeState.value.ghostPosition == bellPosition
-        ) return
+        if (pacman.pacmanState.value.pacmanPosition == bellPosition || blinky.blinkyState.value.ghostPosition == bellPosition || pinky.pinkyState.value.ghostPosition == bellPosition || inky.inkyState.value.ghostPosition == bellPosition || clyde.clydeState.value.ghostPosition == bellPosition) return
 
         boardController.updateCurrentMap(bellPosition, BoardController.BELL_CHAR)
         isBellAppear = true
         centralTimerController.startTimerController(CentralTimerController.BELL_TIMER)
     }
+
     fun onPause() {
-        if(boardController.boardState.value.gameStatus!=GameStatus.ONGOING) return
+        if (boardController.boardState.value.gameStatus != GameStatus.ONGOING) return
         if (!isGameStarted) return
         pauseController.pause {
             gameJobIsPaused = true

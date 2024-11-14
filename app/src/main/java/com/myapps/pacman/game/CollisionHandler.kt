@@ -42,6 +42,7 @@ class CollisionHandler(
         ghostStates: List<StateFlow<GhostData>>,
         mapState: StateFlow<BoardData>
     ) {
+        _isPaused.value = false
         job?.cancel()
         job = CoroutineScope(coroutineDispatcher).launch {
             combine(
