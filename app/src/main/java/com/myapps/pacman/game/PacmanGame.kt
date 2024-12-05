@@ -1,5 +1,12 @@
 package com.myapps.pacman.game
 
+// é a controladora principal do jogo Pacman, responsável por integrar os elementos
+// centrais do jogo, gerenciar os estados dos personagens (Pacman e fantasmas), controlar
+// os eventos do jogo (como colisões e mudanças de estado), e coordenar a lógica de tempo
+// e movimentação. Ela utiliza injeção de dependência para conectar diferentes serviços
+// e módulos necessários para o funcionamento do jogo.
+
+
 import com.myapps.pacman.board.BoardController
 import com.myapps.pacman.R
 import com.myapps.pacman.game.coroutines.CoroutineSupervisor

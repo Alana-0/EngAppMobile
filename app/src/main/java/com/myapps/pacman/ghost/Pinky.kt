@@ -1,5 +1,9 @@
 package com.myapps.pacman.ghost
 
+//comportamento que se baseia na direção atual do Pac-Man. Seu objetivo é antecipar os movimentos de
+// Pac-Man, movendo-se para uma posição determinada por um deslocamento fixo (offset) na direção em
+// que Pac-Man está indo.
+
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman

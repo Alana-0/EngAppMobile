@@ -1,5 +1,11 @@
 package com.myapps.pacman.ui
 
+// é responsável por renderizar o tabuleiro do jogo Pac-Man na tela, gerenciando a animação dos elementos do jogo como
+// Pac-Man, fantasmas e comida. Utiliza SurfaceView e Handler para desenhar de forma eficiente e atualiza
+// os elementos visuais periodicamente, com base no estado do jogo. A classe também coleta dados do jogo,
+// como o placar, o número de vidas e o layout do tabuleiro, e ajusta a aparência dos elementos de acordo
+// com o nível atual.
+
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context

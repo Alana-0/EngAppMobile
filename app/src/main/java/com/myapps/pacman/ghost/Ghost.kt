@@ -1,5 +1,8 @@
 package com.myapps.pacman.ghost
 
+//A classe Ghost é a classe base para os fantasmas do jogo e contém diversos métodos que controlam o
+// movimento, a lógica de comportamento e a interação com o Pacman
+
 import com.myapps.pacman.board.BoardController
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix

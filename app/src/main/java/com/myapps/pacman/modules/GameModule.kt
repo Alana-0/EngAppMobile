@@ -1,5 +1,9 @@
 package com.myapps.pacman.modules
 
+//configura as dependências para o jogo Pacman. Ele fornece objetos necessários para o funcionamento
+// do jogo e gerencia a injeção dessas dependências no ciclo de vida da aplicação. O módulo usa o Dagger
+// Hilt para gerenciar a injeção de dependências de forma eficiente.
+
 import android.content.Context
 import com.myapps.pacman.game.CollisionHandler
 import com.myapps.pacman.game.ICollisionHandler

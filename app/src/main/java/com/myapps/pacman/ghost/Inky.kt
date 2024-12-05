@@ -1,5 +1,9 @@
 package com.myapps.pacman.ghost
 
+//com comportamento específico baseado na posição do Pac-Man e de outro fantasma (no caso, o Blinky)
+// A classe herda de Ghost e implementa a lógica específica de movimento e cálculo de direção para o
+// fantasma Inky.
+
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman

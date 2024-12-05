@@ -1,4 +1,8 @@
 package com.myapps.pacman.game
+//define o contrato para gerenciar as colisões no jogo Pacman.
+// Ela atua como uma camada de abstração, especificando os métodos e variáveis
+// necessários para lidar com as diferentes interações entre o Pacman, fantasmas, e
+// itens no tabuleiro, mas sem implementar diretamente essas funcionalidades.
 
 import com.myapps.pacman.states.BoardData
 import com.myapps.pacman.states.GhostData

@@ -1,4 +1,8 @@
 package com.myapps.pacman.timer
+// A classe Timer gerencia um temporizador com base em coroutines. Ela utiliza um intervalo de tempo
+// definido (default 1000ms) para contar os "ticks" enquanto o temporizador não estiver pausado.
+// Permite inicializar o temporizador, pausar/despausar, resetar o contador e parar o temporizador.
+// O contador é armazenado de forma atômica, permitindo acesso seguro em ambientes concorrentes.
 
 import com.myapps.pacman.modules.qualifiers.DispatcherDefault
 import kotlinx.coroutines.CoroutineDispatcher

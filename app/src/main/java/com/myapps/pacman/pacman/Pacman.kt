@@ -1,5 +1,10 @@
 package com.myapps.pacman.pacman
 
+//gerencia a lógica de movimento, colisões, direções e atualização de estado para o personagem Pacman
+// no jogo. Ela integra o controle de tempo para o movimento do Pacman e oferece métodos para atualizar
+// atributos como direção, posição e status (vida, energizador). O estado do Pacman é reativo e mantido
+// em um StateFlow, permitindo que a interface do jogo se atualize conforme o Pacman se move ou seu status
+// muda.
 
 import com.myapps.pacman.board.BoardController
 import com.myapps.pacman.states.PacmanData
@@ -17,10 +22,10 @@ class Pacman(
     private val actorsMovementsTimerController: ActorsMovementsTimerController
 ) {
 
-    private var direction: Direction = initialDirection
-    private var lifeStatement: Boolean = true
-    private var energizerStatus: Boolean = initialEnergizerStatus
-    private var currentPosition: Position = initialPosition
+    private var direction: Direction = initialDirection //Direção atual do Pacman (padrão é para a direita).
+    private var lifeStatement: Boolean = true //Indicador se o Pacman está vivo ou não.
+    private var energizerStatus: Boolean = initialEnergizerStatus // Indica se o Pacman está com o poder do energizador ativado.
+    private var currentPosition: Position = initialPosition //Posição atual do Pacman no mapa.
 
     private val _pacmanState = MutableStateFlow(
         PacmanData(

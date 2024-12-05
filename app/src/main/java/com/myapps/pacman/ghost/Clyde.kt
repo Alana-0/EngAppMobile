@@ -1,5 +1,9 @@
 package com.myapps.pacman.ghost
 
+//Clyde representa o comportamento do fantasma Clyde no jogo Pacman. Semelhante a outras classes de
+// fantasmas, ela gerencia a posição, direção e velocidade de Clyde, além de interagir com outros elementos
+// do jogo, como o Pacman e o modo do fantasma.
+
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman

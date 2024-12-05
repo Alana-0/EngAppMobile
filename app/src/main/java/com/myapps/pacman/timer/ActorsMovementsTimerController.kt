@@ -1,4 +1,9 @@
 package com.myapps.pacman.timer
+// A classe ActorsMovementsTimerController controla o tempo de movimento dos atores do jogo Pacman,
+// incluindo Pacman e os fantasmas (Blinky, Inky, Pinky, Clyde). Ela permite ajustar a velocidade de
+// movimento de cada ator, pausar e retomar os movimentos, além de controlar a execução dos movimentos
+// de forma assíncrona, respeitando a pausa do jogo e o atraso específico de cada ator.
+
 
 import com.myapps.pacman.game.PauseController
 import com.myapps.pacman.game.PauseListener

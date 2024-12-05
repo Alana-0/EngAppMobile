@@ -1,4 +1,9 @@
 package com.myapps.pacman.timer
+// A classe TimerController gerencia o controle de um temporizador. Ela fornece métodos para iniciar,
+// pausar, retomar, reiniciar e resetar o temporizador. Quando pausado, ela armazena os "ticks" pausados
+// e calcula o tempo decorrido corretamente. A classe também permite obter o número atual de "ticks"
+// considerando o estado do temporizador (iniciado, pausado ou não iniciado).
+
 
 import javax.inject.Inject
 

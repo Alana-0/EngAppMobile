@@ -1,5 +1,12 @@
 package com.myapps.pacman.timer
 
+//// A classe CentralTimerController gerencia múltiplos temporizadores no jogo Pacman.
+// Ela permite inicializar, iniciar, pausar, retomar, reiniciar e parar os temporizadores de
+// diversos componentes (como fantasmas e energizadores) através de controladores específicos.
+// Cada temporizador é identificado por um ID único, e é possível gerenciar todos ou um temporizador
+// de forma individual. A classe também oferece a funcionalidade de obter os "ticks" de um temporizador,
+// que são contagens do tempo decorrido.
+
 import javax.inject.Inject
 
 class CentralTimerController(

@@ -1,5 +1,7 @@
 package com.myapps.pacman.game
 
+// é gerenciar colisões no jogo Pacman, monitorando continuamente o estado do jogo
+// (posição do Pacman, fantasmas, e elementos do mapa) e reagindo às interações.
 import com.myapps.pacman.board.BoardController
 import com.myapps.pacman.modules.qualifiers.DispatcherDefault
 import com.myapps.pacman.states.BoardData
@@ -23,6 +25,8 @@ import javax.inject.Inject
 
 
 class CollisionHandler(
+    // Classe implementa a interface `ICollisionHandler` para gerenciar colisões no jogo.
+    // Usa um `CoroutineDispatcher` para definir o contexto de execução das operações assíncronas.
     private val coroutineDispatcher: CoroutineDispatcher
 ):ICollisionHandler{
     private val _isPaused = MutableStateFlow(false)

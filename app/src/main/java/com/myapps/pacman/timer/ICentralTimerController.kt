@@ -1,4 +1,8 @@
 package com.myapps.pacman.timer
+// Interface que define os métodos para controlar os temporizadores no jogo Pacman. Ela permite inicializar ,
+// ]parar, iniciar, pausar, retomar, reiniciar e remover temporizadores individuais ou de todos os
+// controladores. Além disso, oferece a capacidade de obter os "ticks" (tempo decorrido) de um temporizador
+// específico.
 
 interface ICentralTimerController {
     fun initTimerFunction()

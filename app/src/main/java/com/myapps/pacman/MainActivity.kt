@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+
+// Inicia a atividade com a injeção de dependência do Hilt
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding:ActivityMainBinding
 
+    // Método que é chamado quando a atividade é criada
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -35,13 +38,14 @@ class MainActivity : AppCompatActivity() {
         configureRightButton()
         configureUpButton()
         configureStartResetButton()
-        configureSoundButton()
+
         configurePauseResumeButton()
 
         lifecycleScope.launch {
             viewModel.gameIsStarted.collect{
                 if(it){
-                    binding.pacmanView.setActiveGameView(true)
+                    binding.pacmanView.setActiveGameView(true) // Ativa a visualização do jogo
+                    // Atualiza os dados do jogo com informações do ViewModel
                     binding.pacmanView.setGameBoardData(viewModel.mapBoardData)
                     binding.pacmanView.setPacmanData(viewModel.pacmanData)
                     binding.pacmanView.setBlinkyData(viewModel.blinkyData)
@@ -50,11 +54,12 @@ class MainActivity : AppCompatActivity() {
                     binding.pacmanView.setClydeData(viewModel.clydeData)
                 }
                 else{
-                    binding.pacmanView.setActiveGameView(false)
-                    binding.pacmanView.stopAllCurrentJobs()
+                    binding.pacmanView.setActiveGameView(false) // Desativa a visualização do jogo
+                    binding.pacmanView.stopAllCurrentJobs() // Para todas as tarefas em andamento
                 }
             }
         }
+        // Observa o estado de "gameIsMute" e ajusta o status de som do jogo
         lifecycleScope.launch {
             viewModel.gameIsMute.collect{
                 if(it){
@@ -65,44 +70,50 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        // Observa o estado de "gameIsPaused" e ajusta o status de pausa do jogo
         lifecycleScope.launch{
             viewModel.gameIsPaused.collect{
                 if(it){
-                    binding.pacmanView.changePauseGameStatus(true)
-                    binding.pacmanView.pauseGameDraw()
+                    binding.pacmanView.changePauseGameStatus(true)// Pausa o jogo
+                    binding.pacmanView.pauseGameDraw() // Pausa a renderização do jogo
                 }
                 else{
-                    binding.pacmanView.changePauseGameStatus(false)
-                    binding.pacmanView.resumeGameDraw()
+                    binding.pacmanView.changePauseGameStatus(false) // Retoma o jogo
+                    binding.pacmanView.resumeGameDraw() // Retoma a renderização do jogo
                 }
             }
         }
     }
 
+    // Configura o botão de movimentação para cima
     private fun configureUpButton(){
         binding.upButton.setOnClickListener {
             viewModel.onEvents(PacmanEvents.UpDirection)
         }
     }
 
+    // Configura o botão de movimentação para baixo
     private fun configureDownButton(){
         binding.downButton.setOnClickListener {
             viewModel.onEvents(PacmanEvents.DownDirection)
         }
     }
 
+    // Configura o botão de movimentação para a direita
     private fun configureRightButton(){
         binding.rightButton.setOnClickListener {
             viewModel.onEvents(PacmanEvents.RightDirection)
         }
     }
 
+    // Configura o botão de movimentação para a esquerda
     private fun configureLeftButton(){
         binding.leftButton.setOnClickListener {
             viewModel.onEvents(PacmanEvents.LeftDirection)
         }
     }
 
+    // Configura o botão de iniciar/zerar o jogo
     private fun configureStartResetButton() {
         binding.startResetButton.setOnClickListener {
             binding.startResetButton.isEnabled = false
@@ -119,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Configura o botão de pausa/retomar o jogo
     private fun configurePauseResumeButton(){
         binding.pauseResetButton.setOnClickListener {
             binding.pauseResetButton.isEnabled = false
@@ -135,21 +147,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun configureSoundButton(){
-        binding.soundButton.setOnClickListener {
-            binding.soundButton.isEnabled = false
-            if(viewModel.gameIsMute.value){
-                viewModel.onEvents(PacmanEvents.RecoverSounds)
-            }
-            else{
-                viewModel.onEvents(PacmanEvents.MuteSounds)
-            }
-            binding.soundButton.postDelayed({
-                binding.soundButton.isEnabled = true
-            }, 500)
-        }
-    }
 
+    // Método chamado quando a atividade é destruída, garantindo que o jogo seja parado e os recursos sejam liberados
     override fun onDestroy() {
         super.onDestroy()
         viewModel.onEvents(PacmanEvents.Stop)

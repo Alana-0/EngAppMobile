@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+
+    <!-- O manifest é essencial para qualquer aplicativo Android, especificando as permissões e configurando as atividades.
+Neste código, há uma única atividade chamada MainActivity, que é a tela inicial do aplicativo.
+O tema, suporte a backup e ícones do aplicativo estão configurados no elemento <application>.. -->
+
     <application
         android:name=".PacmanApplication"
         android:allowBackup="true"

@@ -1,5 +1,9 @@
 package com.myapps.pacman.ghost
 
+// A classe Blinky representa o fantasma Blinky no jogo Pacman e é responsável por seu comportamento
+//de movimento e atualização de estado. Ela estende a classe Ghost e contém propriedades como posição,
+//direção, alvo (geralmente o Pacman), e delay de movimento. Utiliza o StateFlow para manter o estado do Blinky, incluindo sua posição, direção e status de vida, de forma reativa.
+
 import com.myapps.pacman.utils.Direction
 import com.myapps.pacman.utils.matrix.Matrix
 import com.myapps.pacman.pacman.Pacman
